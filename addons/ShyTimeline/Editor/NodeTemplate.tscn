@@ -1,0 +1,50 @@
+[gd_scene load_steps=2 format=2]
+
+[ext_resource path="res://addons/ShyTimeline/Editor/Node.gd" type="Script" id=1]
+
+[node name="Node" type="GraphNode"]
+margin_right = 128.0
+margin_bottom = 62.0
+rect_min_size = Vector2( 256, 0 )
+show_close = true
+slot/0/left_enabled = true
+slot/0/left_type = 0
+slot/0/left_color = Color( 1, 1, 1, 1 )
+slot/0/right_enabled = true
+slot/0/right_type = 0
+slot/0/right_color = Color( 1, 1, 1, 1 )
+script = ExtResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+margin_left = 16.0
+margin_top = 24.0
+margin_right = 240.0
+margin_bottom = 56.0
+
+[node name="Label" type="LineEdit" parent="HBoxContainer"]
+margin_right = 179.0
+margin_bottom = 32.0
+rect_min_size = Vector2( 64, 32 )
+size_flags_horizontal = 3
+
+[node name="ButtonAdd" type="Button" parent="HBoxContainer"]
+margin_left = 183.0
+margin_right = 203.0
+margin_bottom = 32.0
+text = "+"
+
+[node name="ButtonRemove" type="Button" parent="HBoxContainer"]
+margin_left = 207.0
+margin_right = 224.0
+margin_bottom = 32.0
+text = "-"
+
+[connection signal="offset_changed" from="." to="." method="_on_Node_offset_changed"]
+[connection signal="renamed" from="." to="." method="_on_Node_renamed"]
+[connection signal="focus_exited" from="HBoxContainer/Label" to="." method="_on_Label_focus_exited"]
+[connection signal="text_entered" from="HBoxContainer/Label" to="." method="_on_Label_text_entered"]
+[connection signal="pressed" from="HBoxContainer/ButtonAdd" to="." method="_on_ButtonAdd_pressed"]
+[connection signal="pressed" from="HBoxContainer/ButtonRemove" to="." method="_on_ButtonRemove_pressed"]

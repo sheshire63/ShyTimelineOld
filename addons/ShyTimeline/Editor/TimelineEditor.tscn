@@ -1,0 +1,125 @@
+[gd_scene load_steps=4 format=2]
+
+[ext_resource path="res://addons/ShyTimeline/Editor/TimelineEditor.gd" type="Script" id=1]
+[ext_resource path="res://addons/ShyTimeline/Editor/GraphEdit.gd" type="Script" id=2]
+[ext_resource path="res://addons/ShyTimeline/Editor/TextEdit.gd" type="Script" id=3]
+
+[node name="TimelineEditor" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+script = ExtResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="VBox" type="VBoxContainer" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBox"]
+margin_right = 1024.0
+margin_bottom = 20.0
+
+[node name="GlobalVars" type="Button" parent="VBox/HBoxContainer"]
+margin_right = 84.0
+margin_bottom = 20.0
+text = "Gloabl Vars"
+
+[node name="HSplitContainer" type="HSplitContainer" parent="VBox"]
+margin_top = 24.0
+margin_right = 1024.0
+margin_bottom = 582.0
+size_flags_vertical = 3
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="GraphEdit" type="GraphEdit" parent="VBox/HSplitContainer"]
+margin_right = 506.0
+margin_bottom = 558.0
+size_flags_horizontal = 3
+right_disconnects = true
+scroll_offset = Vector2( -506, -20 )
+script = ExtResource( 2 )
+
+[node name="PopupMenu" type="PopupMenu" parent="VBox/HSplitContainer/GraphEdit"]
+margin_right = 20.0
+margin_bottom = 20.0
+
+[node name="TextEditor" type="VBoxContainer" parent="VBox/HSplitContainer"]
+margin_left = 518.0
+margin_right = 1024.0
+margin_bottom = 558.0
+size_flags_horizontal = 3
+script = ExtResource( 3 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBox/HSplitContainer/TextEditor"]
+margin_right = 506.0
+margin_bottom = 20.0
+
+[node name="Bold" type="Button" parent="VBox/HSplitContainer/TextEditor/HBoxContainer"]
+margin_right = 21.0
+margin_bottom = 20.0
+text = "B"
+
+[node name="TextEdit" type="TextEdit" parent="VBox/HSplitContainer/TextEditor"]
+margin_top = 24.0
+margin_right = 506.0
+margin_bottom = 558.0
+size_flags_vertical = 3
+custom_colors/symbol_color = Color( 0.760784, 0.0666667, 0.733333, 1 )
+highlight_current_line = true
+syntax_highlighting = true
+show_line_numbers = true
+draw_tabs = true
+draw_spaces = true
+fold_gutter = true
+highlight_all_occurrences = true
+hiding_enabled = true
+wrap_enabled = true
+minimap_draw = true
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="VBox"]
+margin_top = 586.0
+margin_right = 1024.0
+margin_bottom = 600.0
+
+[node name="Hint" type="Label" parent="VBox/HBoxContainer2"]
+margin_right = 820.0
+margin_bottom = 14.0
+size_flags_horizontal = 3
+text = "Select a Node to change parameters"
+
+[node name="Credit" type="Label" parent="VBox/HBoxContainer2"]
+margin_left = 824.0
+margin_right = 1024.0
+margin_bottom = 14.0
+custom_colors/font_color = Color( 0, 0, 0, 0.247059 )
+text = "Shy Timeline made by Sheshire"
+align = 1
+
+[connection signal="pressed" from="VBox/HBoxContainer/GlobalVars" to="." method="_on_GlobalVars_pressed"]
+[connection signal="connection_from_empty" from="VBox/HSplitContainer/GraphEdit" to="VBox/HSplitContainer/GraphEdit" method="_on_GraphEdit_connection_from_empty"]
+[connection signal="connection_request" from="VBox/HSplitContainer/GraphEdit" to="VBox/HSplitContainer/GraphEdit" method="_on_GraphEdit_connection_request"]
+[connection signal="connection_to_empty" from="VBox/HSplitContainer/GraphEdit" to="VBox/HSplitContainer/GraphEdit" method="_on_GraphEdit_connection_to_empty"]
+[connection signal="copy_nodes_request" from="VBox/HSplitContainer/GraphEdit" to="VBox/HSplitContainer/GraphEdit" method="_on_GraphEdit_copy_nodes_request"]
+[connection signal="delete_nodes_request" from="VBox/HSplitContainer/GraphEdit" to="VBox/HSplitContainer/GraphEdit" method="_on_GraphEdit_delete_nodes_request"]
+[connection signal="disconnection_request" from="VBox/HSplitContainer/GraphEdit" to="VBox/HSplitContainer/GraphEdit" method="_on_GraphEdit_disconnection_request"]
+[connection signal="duplicate_nodes_request" from="VBox/HSplitContainer/GraphEdit" to="VBox/HSplitContainer/GraphEdit" method="_on_GraphEdit_duplicate_nodes_request"]
+[connection signal="focus_entered" from="VBox/HSplitContainer/GraphEdit" to="." method="_on_GraphEdit_focus_entered"]
+[connection signal="node_selected" from="VBox/HSplitContainer/GraphEdit" to="." method="_on_GraphEdit_node_selected"]
+[connection signal="node_selected" from="VBox/HSplitContainer/GraphEdit" to="VBox/HSplitContainer/GraphEdit" method="_on_GraphEdit_node_selected"]
+[connection signal="node_unselected" from="VBox/HSplitContainer/GraphEdit" to="VBox/HSplitContainer/GraphEdit" method="_on_GraphEdit_node_unselected"]
+[connection signal="paste_nodes_request" from="VBox/HSplitContainer/GraphEdit" to="VBox/HSplitContainer/GraphEdit" method="_on_GraphEdit_paste_nodes_request"]
+[connection signal="popup_request" from="VBox/HSplitContainer/GraphEdit" to="VBox/HSplitContainer/GraphEdit" method="_on_GraphEdit_popup_request"]
+[connection signal="pressed" from="VBox/HSplitContainer/TextEditor/HBoxContainer/Bold" to="VBox/HSplitContainer/TextEditor" method="_on_Bold_pressed"]
+[connection signal="symbol_lookup" from="VBox/HSplitContainer/TextEditor/TextEdit" to="VBox/HSplitContainer/TextEditor" method="_on_TextEdit_symbol_lookup"]
+[connection signal="text_changed" from="VBox/HSplitContainer/TextEditor/TextEdit" to="VBox/HSplitContainer/TextEditor" method="_on_TextEdit_text_changed"]
