@@ -1,28 +1,10 @@
-[gd_scene load_steps=9 format=2]
+[gd_scene load_steps=6 format=2]
 
 [ext_resource path="res://addons/ShyTimeline/Nodes/Timeline.gd" type="Script" id=1]
 [ext_resource path="res://addons/ShyTimeline/Nodes/TimelineChoiceHandler.gd" type="Script" id=2]
-[ext_resource path="res://addons/ShyTimeline/TimelineRes.gd" type="Script" id=3]
+[ext_resource path="res://ExampleTimeline.tres" type="Resource" id=3]
 [ext_resource path="res://Example.gd" type="Script" id=4]
 [ext_resource path="res://addons/ShyTimeline/Nodes/TimelineTextHandler.gd" type="Script" id=5]
-[ext_resource path="res://addons/ShyTimeline/Events/Text.gd" type="Script" id=6]
-
-[sub_resource type="Resource" id=2]
-script = ExtResource( 6 )
-next_events = {
-0: [  ]
-}
-pos = Vector2( -520, 260 )
-channel = ""
-text = "Test"
-
-[sub_resource type="Resource" id=1]
-script = ExtResource( 3 )
-events = {
-"Start": SubResource( 2 )
-}
-start_event = "Start"
-name = ""
 
 [node name="Example" type="Control"]
 anchor_right = 1.0
@@ -34,7 +16,7 @@ __meta__ = {
 
 [node name="Timeline" type="Node" parent="."]
 script = ExtResource( 1 )
-timeline_res = SubResource( 1 )
+timeline_res = ExtResource( 3 )
 autostart = true
 settings = {
 }
@@ -43,12 +25,6 @@ settings = {
 script = ExtResource( 2 )
 settings = {
 }
-button = null
-button_text_property = ".:text"
-button_overrides = [  ]
-button_container_path = NodePath("")
-wait_for_button_press = true
-time_bar_path = NodePath("")
 
 [node name="TextHandler" type="Node" parent="Timeline"]
 script = ExtResource( 5 )

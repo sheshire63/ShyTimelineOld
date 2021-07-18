@@ -85,7 +85,7 @@ func _start_handle(event: Resource, event_id: String, id: int) -> void:
 	settings_override = {}
 	current_event = {"event": event_id, "id": id}
 	_segment = 0
-	_segments = Variables.format_text(event.text, self)
+	_segments = Variables.format_text(event.text, get_setting("wait_after_line"))
 	_history.append({"segments": _segments, "event": event, "id": id})
 	if _history.size() > get_setting("rollback_history_length"):
 		_history.pop_front()
@@ -104,9 +104,9 @@ func _finish_handle() -> void:
 func _handle_segment(segment: Dictionary, id: String, instant := false) -> void:
 	is_active = true
 	var old_length: int = text_label.text.length()
-	text_label.bbcode_text += segment.text
+	text_label.bbcode_text += segment.get("text", "")
 	text_label.visible_characters = old_length
-	if segment.option == "end_line":
+	if segment.get("action") == "end_line":
 		text_label.bbcode_text += "\n"
 	var new_length = text_label.text.length() - old_length
 	tween.remove_all()
@@ -117,7 +117,7 @@ func _handle_segment(segment: Dictionary, id: String, instant := false) -> void:
 		yield(tween, "tween_all_completed")
 	text_label.percent_visible = 1.0
 	if !instant:
-		match segment.option:
+		match segment.get("action"):
 			"wait", "w", "end_line":
 				if segment.value != "":
 					timer.start(segment.value)
@@ -134,9 +134,10 @@ func _handle_segment(segment: Dictionary, id: String, instant := false) -> void:
 				else:
 					timeline.next()
 			var option:
-				settings_override[segment.option] = segment.value
+				if option:
+					settings_override[option] = segment.value
 	_segment += 1
-	is_active =false
+	is_active = false
 
 
 func _on_rollback(_res: Resource, id: String) -> void:

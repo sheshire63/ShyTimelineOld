@@ -85,5 +85,5 @@ func handles(object: Object) -> bool:
 
 
 func edit(object: Object) -> void:
-	if "timeline_res" in object.get_property_list() and object.timeline_res:
+	if object is Timeline and object.timeline_res:
 		timeline_editor.timeline = object.timeline_res

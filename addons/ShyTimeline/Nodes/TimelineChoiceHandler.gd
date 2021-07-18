@@ -55,9 +55,12 @@ func _on_handle_event(event: Resource, event_id: String, id: int) -> void:
 			else:
 				buttons[i] = button.instance() if button else Button.new()
 				button_container.add_child(buttons[i])
+			var text = ""
+			for j in Variables.format_text(event.choice_text[i], false):
+				text += j.get("text", "")
 			buttons[i].get_node((button_text_property as NodePath)).set(
 					(button_text_property as NodePath).get_concatenated_subnames(),
-					Variables.format_line(event.choice_text[i], self))
+					text)
 			buttons[i].connect("pressed", self, "_on_button_pressed", [i, event_id])
 		if event.choose_time  > 0.0:
 			timer.start(event.choose_time)

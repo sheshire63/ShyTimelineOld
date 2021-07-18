@@ -1,0 +1,21 @@
+[gd_resource type="Resource" load_steps=4 format=2]
+
+[ext_resource path="res://addons/ShyTimeline/Events/Text.gd" type="Script" id=1]
+[ext_resource path="res://addons/ShyTimeline/TimelineRes.gd" type="Script" id=2]
+
+[sub_resource type="Resource" id=1]
+script = ExtResource( 1 )
+next_events = {
+0: [  ]
+}
+pos = Vector2( -520, 260 )
+channel = ""
+text = "Test"
+
+[resource]
+script = ExtResource( 2 )
+events = {
+"Start": SubResource( 1 )
+}
+start_event = "Start"
+name = ""

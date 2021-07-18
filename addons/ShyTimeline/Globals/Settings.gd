@@ -8,5 +8,6 @@ const settings := {
 	"rollback_history_length": 10,
 	"next_event_action": "ui_accept",
 	"allow_rollback_choices" : false,
+	"wait_after_line" : true,
 	}
 

@@ -1,14 +1,13 @@
 extends Node
 
+const _SET_VAR_OPERATORS := ["=", "+=", "*=", "-=", "/=", "**=", "//=", "=!"]
 
-var _regex1 := RegEx.new()# to get the content of brackets
-var _regex2 := RegEx.new()# to get the seperate contents of regex 1
-var _regex3 := RegEx.new()# to split the text in segments and setting commands
+var _regex_brackets := RegEx.new()# to get the content of brackets
+var _regex_segments := RegEx.new()# to get the seperate contents of regex 1
+var _regex_subsegments := RegEx.new()# to split the text in segments and setting commands
 
 var variables := {
-	"player": {
-		"type": TYPE_STRING,
-		"value": "Lin"},
+	"player": "Lin",
 	}
 
 
@@ -18,236 +17,272 @@ func _ready() -> void:
 
 func _compile_regex() -> void:
 	#fetches the text up to the current bracket
-	var pre := "(?<pre>[\\w\\W]*?)"
+	var outer := "(?<outer>[\\w\\W]*?)"
 	
 	#fetches the content of a bracket without a /another nested bracked inside
-	var inner := "(?<inner>(?:\\\\{|}|[^\\{}])*?)"
-	if _regex1.compile(pre + "{\\s*" + inner + "\\s*}") != OK:
-		printerr("failed to compile regex1")
+	var inner := "(?<inner>(?:\\\\[\\{\\}]|[^\\{\\}])*?)"
+	if _regex_brackets.compile(outer + "{\\s*" + inner + "\\s*}") != OK:
+		printerr("failed to compile _regex_brackets")
 	
-	var text := "(?:\"(?<{0}>(?:\\\\\"|[^\"])*)\")"
-	var variable := "(?:<(?<{0}>\\w+)>)"
-	var number := "(?<{0}>\\-?\\d+\\.?\\d*)"
-	var boolean := "(?<{0}>(?:[Tt]rue)|[[Ff]alse])"
-	var nested := "(?:\\((?<{0}>[\\w\\W]*?)\\))"
-	var operator := "(?<operator>(?:[\\+\\-]|\\*{1,2}|\\/{1,2}|(?:[<>=!]=)|<>))"
-	var part_a := (
-			"(?:"+
-				"(?:"#Text as String or Var or nested function
-					+ nested.format(["text"]) + 
-					"|" + text.format(["text"]) +
-					"|" +  variable.format(["var"]) +
-				")\\s*" + 
-				"(?:" + #opt. 
-					"(?:" #weight as value or var / or variable for condition
-						+ number.format(["number1"]) +
-						"|" + variable.format(["var1"]) +
-						"|" + text.format(["text1"]) + 
-					")\\s*"+
-					"(?:" +
-						operator + "\\s*" +
-						"(?:" + #opt. operator and compare value as text, number or variable
-							variable.format(["var2"]) + 
-							"|" + text.format(["text2"]) +
-							"|" + number.format(["number2"]) + 
-						")" +
-					")?" + 
-				")?" +
-			")")
-	var part_b := (
-			"(?:" +
-				variable.format(["var3"]) +
-				"\\s*(?<operator2>[\\+\\-\\*/]?=)\\s*" + 
-				"(?:" +
-					variable.format(["var4"]) +
-					"|" + text.format(["text3"]) +
-					"|" + number.format(["number3"]) +
-				")" +
-			")")
-	if _regex2.compile(
-			"\\G\\s*(?:" +
-				"(?:" + part_a + "\\s*" + part_b + ")" +
-				"|" + part_b +
-				"|" + part_a +
-			")\\s*,") != OK:
-		printerr("failed to compile regex2")
+	#splits into segments divided by ",".ignores strings
+	if _regex_segments.compile("((?:[^\\\\]\"[\\w\\W]*?[^\\\\]\"|[^,])*),") != OK:
+		printerr("failed to compile _regex_segments")
 	
-	pre = "(?<pre>[\\w\\W]*?)"
-	number = "(?<{0}>\\-?\\d+\\.?\\d*)"
-	#operator = "(?<operator>[\\+\\-\\*/!])?"
-	if _regex3.compile( pre + "{\\s*(?<option>\\w+)\\s*(?::\\s*(" + number.format(["value"]) + "|" + text.format(["value"]) + ")\\s*)?}") != OK:
-		printerr("failed to compile regex3")
+	#splits segments into values and operators
+	var text := "(?:\"(?<text>(?:\\\\\"|[^\"])*)\")"
+	var integer := "(?<int>\\-?\\d+)"
+	var real := "(?<float>\\-?\\d+\\.\\d+)"
+	var boolean := "(?<bool>(?:[Tt]rue)|[[Ff]alse])"
+	var action := "(?<action>\\w+)\\((?<arg>[\\w\\W]*?)\\)"
+	var variable := "(?:<(?<var>\\w+)>" + action + "?)"
+	var nested := "(?<nested_recursion>\\((?<nested>(?:[^\\(\\)]|\\g'nested_recursion')*)\\))"
+	if _regex_subsegments.compile("\\G\\s*(?:(?<operator>[\\W]{1,3})\\s*)?(?:"
+			+ text + "|" + variable + "|" + real + "|"+ integer + "|" + boolean + "|" + action
+			+ ")") != OK:
+		printerr("failed to compile _regex_subsegments")
 
 
-func format_text(text: String, sender) -> Array:
-	text += "{end_line}"
-	var segments := []
-	text = text.replace("\n", "{end_line}")
-	for i in _regex3.search_all(text):
-		var segment := {}
-		segment["text"] = i.get_string("pre")
-		segment["option"] = i.get_string("option")
-		segment["value"] = i.get_string("value")
-		#segment["operator"] = i.get_string("operator")
-		segments.append(segment)
-	
+func format_text(text: String, replace_new_lines := false) -> Array:
 	var override_settings := {}
-	for i in segments:
-		if ! i.option in ["wait", "w", "continue", "cont", "c"]:
-			if i.value != "":
-				override_settings[i.option] = i.value
-			else:
-				override_settings.erase(i.option)
-		
-		i.text = format_line(i.text, sender)
-	return segments
+	text += "{wait()}"
+	var lines := []
+	if replace_new_lines:
+		text = text.replace("\n", "{end_line()}")#todo: use regix to ignore escaped
+	for i in _regex_brackets.search_all(text):
+		lines.append({"text": i.get_string("outer")})
+		#segment["operator"] = i.get_string("operator")
+		lines.append_array(_handle_bracket(i.get_string("inner")))
+	return lines
 
 
-func format_line(text:String, sender, override_settings := {}) -> String:
-	var doo = true
-	while doo:
-		var temp = text
-		var do = true
-		while do:
-			var tmp = text
-			text = _format_step(text)
-			do = tmp != text
-		
-		do = true
-		while do:
-			var tmp = text
-			text = text.format(get_values(), "<_>")
-			do = tmp != text
-		
-		if override_settings.get("remove_double_spaces",
-				sender.get_setting("remove_double_spaces")):
-			do = true
-			while do:
-				var tmp = text
-				text = text.replace("  ", " ")
-				do = tmp != text
-		doo = temp != text
-	return text
+func _handle_bracket(line: String) -> Array:
+	line += ","
+	var actions = []
+	var weights = []
+	for j in _regex_segments.search_all(line):
+		actions.append([])
+		weights.append([])
+		var is_weight = false
+		var is_action = true
+		var tmp = []
+		for k in _regex_subsegments.search_all(j.strings[1]):
+			if k.get_string("operator") == "" and tmp:
+				if is_weight:
+					weights[-1].append_array(tmp)
+					is_weight = false
+				else:
+					actions[-1].append_array(tmp)
+					is_action = false
+					is_weight = true
+				tmp = []
+			elif k.get_string("operator") in _SET_VAR_OPERATORS:
+				is_action = true
+				is_weight = false
+			tmp.append(k)
+		if is_action:
+			actions[-1].append_array(tmp)
+		else:
+			weights[-1].append_array(tmp)
+			
+	var total_weight = 0
+	for j in weights.size():
+		if weights[j]:
+			weights[j] = float(_add_up_values(weights[j]))
+			total_weight += weights[j]
+	var defaults = weights.count([])
+	for j in weights.size():
+		if weights[j] == []:
+			weights[j] = max(0.0, (1.0 - total_weight) / defaults)
+	var random = rand_range(0.0, total_weight)
+	for j in weights.size():
+		random -= weights[j]
+		if random <= 0.0:
+			return _handle_actions(actions[j])
+	return []
 
-func _format_step(text:String) -> String:
-	text += "{}"
-	var result := ""
-	var r = _regex1.search_all(text)
-	for i in r:
-		result += i.get_string("pre")
-		var r2 = _regex2.search_all(i.get_string("inner") + ",")
-		var total = 0.0
-		var weights = []
-		var defaults = []
-		weights.resize(r2.size())
-		for j in r2.size():
-			var operator = r2[j].get_string("operator")
-			var weight := -1.0
-			if operator == "": #just weight
-				var number = r2[j].get_string("number1")
-				var var1 = r2[j].get_string("var1")
-				weight = float(number) if number != "" else weight
-				weight = float(variables.get(var1, {}).get("value", 0.0)) if var1 != "" else weight
-				if weight < 0.0:#add to list and set weight later?
-					weight = 0.0
-					defaults.append(j)
-			else:
-				weight = 0.0
-				var var1 = r2[j].get_string("var1")
-				var var2 = r2[j].get_string("var2")
-				var text1 = str(variables.get(var1, {}).get("value", r2[j].get_string("text1")))
-				var text2 = str(variables.get(var2, {}).get("value", r2[j].get_string("text2")))
-				var number1 = float(variables.get(var1, {}).get("value",
-						r2[j].get_string("number1")))
-				var number2 = float(variables.get(var2, {}).get("value",
-						r2[j].get_string("number2")))
-				match operator:
-					"+":
-						weight = number1 + number2
-					"-":
-						weight = number1 - number2
-					"*":
-						weight = number1 * number2
-					"/":
-						weight = number1 / number2
-					"**":
-						weight = pow(number1, number2)
-					"//":
-						weight = pow(number2, 1.0 / number1)
-					"<", "<=", "<>":
-						weight = 1.0 if number1 < number2 else weight
-						continue
-					">", ">=", "<>":
-						weight = 1.0 if number1 > number2 else weight
-						continue
-					"<=", ">=":
-						weight = 1.0 if number1 == number2 else weight
-					"==":
-						weight = 1.0 if text1 == text2 else weight
-					"!=":
-						weight = 1.0 if text1 != text2 else weight
-					var err:
-						printerr("invalid operator: %s"%err)
-			total += weight
-			weights[j] = weight
-		if total < 1.0:
-			for j in defaults:
-				weights[j] = (1.0 - total) / defaults.size()
-		var rand_c = randf() * max(1.0, total)
-		for j in r2.size():
-			if weights[j] != null:
-				rand_c -= weights[j]
-				if rand_c <= 0.0:
-					result += str(variables.get(r2[j].get_string("var"), {}).get("value", r2[j].get_string("text")))
-					var var3 = r2[j].get_string("var3")
-					var var4 = r2[j].get_string("var4")
-					var text3 = r2[j].get_string("text3")
-					var boolean
-					var value = float(r2[j].get_string("number3")) if r2[j].get_string("number3") != "" else text3
-					var b = variables.get(var4, {}).get("value", value)
-					if not var3 in variables:
-						if var4:
-							variables[var3] = {"value": null, "type": variables[var4].type}
-						elif text3:
-							variables[var3] = {"value": "", "type": TYPE_STRING}
-						elif boolean:
-							variables[var3] = {"value": "", "type": TYPE_BOOL}
-						elif r2[j].get_string("number").is_valid_integer:
-							variables[var3] = {"value": "", "type": TYPE_INT}
-						else:
-							variables[var3] = {"value": "", "type": TYPE_REAL}
-					match variables[var3].type:
-						TYPE_INT:
-							b = int(b)
-						TYPE_BOOL:
-							b = bool(b)
-						TYPE_REAL:
-							b = float(b)
-						TYPE_STRING:
-							b = str(b)
-					match r2[j].get_string("operator2"):
-						"=":
-							variables[var3].value = b
-						"+=":
-							variables[var3].value += b
-						"-=":
-							variables[var3].value -= b
-						"*=":
-							variables[var3].value *= b
-						"/=":
-							variables[var3].value /= b
-					break
+
+func _add_up_values(actions: Array):
+	var value_a = ""
+	while actions:
+		var action = actions[0].get_string("operator")
+		#get value:
+		var value_b
+		if actions[0].get_string("var") != "":
+			value_b = variables.get(actions[0].get_string("var"))
+		elif actions[0].get_string("int") != "":
+			value_b = int(actions[0].get_string("int"))
+		elif actions[0].get_string("float") != "":
+			value_b = float(actions[0].get_string("float"))
+		elif actions[0].get_string("bool") != "":
+			value_b = true if actions[0].get_string("bool") == "true" else false
+		elif actions[0].get_string("nested") != "":
+			value_b = _handle_bracket(actions[0].get_string("nested"))
+		else:
+			value_b = actions[0].get_string("text")
+
+		if actions[0].get_string("action") != "":
+			match actions[0].get_string("action"):
+				"default":
+					if value_b == null:
+						value_b = _handle_bracket(actions[0].get_string("arg"))
+				"type":
+					match actions[0].get_string("arg"):
+						"int":
+							value_b = int(value_b)
+						"bool":
+							value_b = bool(value_b)
+						"float":
+							value_b = float(value_b)
+						"string":
+							value_b = str(value_b)
+		# add up:
+		match action:
+			"":
+				value_a = value_b
+			"+":
+				if value_a is String:
+					value_a += str(value_b)
+				elif value_a is int and value_b is int:
+					value_a = value_a + value_b
+				else:
+					value_a = float(value_a) + float(value_b)
+			"-":
+				if value_a is int and value_b is int:
+					value_a = value_a - value_b
+				else:
+					value_a = float(value_a) - float(value_b)
+			"*":
+				if value_a is String:
+					value_a = value_a.repeat(int(value_b))
+				elif value_a is int and value_b is int:
+					value_a = value_a * value_b
+				else:
+					value_a = float(value_a) * float(value_b)
+			"/":
+				if float(value_b) == 0.0:
+					value_a = 0 if value_a is int else 0.0
+				else:
+					if value_a is int and value_b is int:
+						value_a = int(value_a / value_b)
+					else:
+						value_a = float(value_a) / float(value_b)
+			"**":
+				if value_a is int and value_b is int:
+					value_a = int(pow(value_a, value_b))
+				else:
+					value_a = pow(float(value_a), float(value_b))
+			"//":
+				if value_a is int and value_b is int:
+					value_a = int(pow(value_a, 1 / float(value_b)))
+				else:
+					value_a = pow(float(value_a), 1 / float(value_b))
+			"%":
+				value_a = int(value_a)%int(value_b)
+			"==":
+				value_a = value_a == value_b
+			"!=":
+				value_a = value_a != value_b
+			"&":
+				value_a = value_a and value_b
+			"|":
+				value_a = value_a or value_b
+			"||":
+				value_a = bool(value_a) != bool(value_b)
+			"<":
+				if value_a is String:
+					if value_b is String:
+						value_a = value_a.length() < value_b.length()
+					else:
+						value_a = value_a.length < float(value_b)
+				else:
+					value_a = float(value_a) < float(value_b)
+			">":
+				if value_a is String:
+					if value_b is String:
+						value_a = value_a.length() > value_b.length()
+					else:
+						value_a = value_a.length > float(value_b)
+				else:
+					value_a = float(value_a) > float(value_b)
+			"<=":
+				if value_a is String:
+					if value_b is String:
+						value_a = value_a.length() <= value_b.length()
+					else:
+						value_a = value_a.length <= float(value_b)
+				else:
+					value_a = float(value_a) <= float(value_b)
+			">=":
+				if value_a is String:
+					if value_b is String:
+						value_a = value_a.length() >= value_b.length()
+					else:
+						value_a = value_a.length >= float(value_b)
+				else:
+					value_a = float(value_a) >= float(value_b)
+			"<>":
+				if value_a is String:
+					if value_b is String:
+						value_a = value_a.length() != value_b.length()
+					else:
+						value_a = value_a.length != float(value_b)
+				else:
+					value_a = float(value_a) != float(value_b)
+			"<<":
+				value_a = value_a << int(value_b)
+			">>":
+				value_a = value_a >> int(value_b)
+			_:
+				return value_a
+		actions.pop_front()
+	return value_a
+
+
+func _handle_actions(actions: Array) -> Array:
+	var result := []
+	while actions:
+		var entry = {}
+		var action = actions[0].get_string("action")
+		if action != "" and actions[0].get_string("var") == "":
+			match action:
+				_:
+					entry.action = action
+					entry.value = actions[0].get_string("arg")
+		elif actions[0].get_string("operator") in _SET_VAR_OPERATORS:
+			var variable = actions[0].get_string("var")
+			var operator = actions[0].get_string("operator")
+			actions.pop_front()
+			var value = _add_up_values(actions)
+			match typeof(variables.get(variable)):
+				TYPE_BOOL:
+					value = bool(value)
+				TYPE_INT:
+					value = int(value)
+				TYPE_REAL:
+					value = float(value)
+				TYPE_STRING:
+					value = str(value)
+			match operator:
+				"=":
+					variables[variable] = value
+				"+=":
+					variables[variable] += value
+				"-=":
+					variables[variable] -= value
+				"*=":
+					variables[variable] *= value
+				"/=":
+					variables[variable] /= value
+				"**=":
+					variables[variable] = pow(variables[variable], value)
+				"//=":
+					variables[variable] = pow(variables[variable], 1 / value)
+		else:
+			entry.text = _add_up_values(actions)
+		result.append(entry)
+		actions.pop_front()
 	return result
 
-
-func get_values() -> Dictionary:
-	var values = {}
-	for i in variables:
-		values[i] = variables[i].value
-	return values
-
-#Syntax: Normal Text <variable> {"Text A 1:1", "Text B" {"Text A weight" 0.5, "Default"} {"Text chance by var" <var>*1} {<var> 1, "alternative" 1} {"text" <var> == 1.0}... 
-# does not work: {"Text" <var>="some text"} -> some text gets converted to a float ???? should work
 
 #{"text" [<weight_variable>]}
 #{"text" [weight]}
@@ -267,3 +302,4 @@ func get_values() -> Dictionary:
 #{<var> += value} and *= /= -=	-= also for invert bool
 #{"text" weight <var> += 3} change a variable if the option is choosen
 	
+#"""

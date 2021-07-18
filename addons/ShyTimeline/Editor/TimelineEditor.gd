@@ -11,7 +11,7 @@ var selected_event : Resource
 
 func _ready() -> void:
 	if !Engine.editor_hint:
-		set_timeline(load("res://Timeline.tres"))
+		set_timeline(load("res://ExampleTimeline.tres"))
 
 
 func set_timeline(new) -> void:
