@@ -91,7 +91,7 @@ func _start_handle(event: Resource, event_id: String, id: int) -> void:
 		_history.pop_front()
 	text_label.bbcode_text = ""
 	text_label.visible_characters = 0
-
+	text_label.visible = true
 
 
 func _finish_handle() -> void:
@@ -99,6 +99,7 @@ func _finish_handle() -> void:
 		timeline.event_handled(current_event.event)
 	current_event = {}
 	text_label.bbcode_text = ""
+	text_label.visible = false
 
 
 func _handle_segment(segment: Dictionary, id: String, instant := false) -> void:

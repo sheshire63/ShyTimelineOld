@@ -26,7 +26,7 @@ func _ready() -> void:
 		button_container = get_node(button_container_path)
 	else:
 		var center_box = CenterContainer.new()
-		center_box.set_anchors_preset(Control.PRESET_WIDE)
+		center_box.set_anchors_preset(Control.PRESET_CENTER)
 		button_container = VBoxContainer.new()
 		var canvas = CanvasLayer.new()
 		canvas.add_child(center_box)
@@ -42,26 +42,27 @@ func _ready() -> void:
 	time_bar.visible = false
 	timer.one_shot = true
 	add_child(timer)
+	_reset_buttons()
 
 
 func _on_handle_event(event: Resource, event_id: String, id: int) -> void:
 	if event.get_node_type() == "ChoiceEvent":
 		is_active = true
 		var buttons = {}
-		for i in event.choice_text:
+		for i in event.choice_text.size():
 			if button_overrides.size() > i and button_overrides[i]:
-				buttons[i] = button_overrides[i]
+				buttons[i] = get_node(button_overrides[i])
 				buttons[i].visible = true
 			else:
 				buttons[i] = button.instance() if button else Button.new()
 				button_container.add_child(buttons[i])
 			var text = ""
-			for j in Variables.format_text(event.choice_text[i], false):
+			for j in Variables.format_text(event.choice_text[i + 1], false):
 				text += j.get("text", "")
 			buttons[i].get_node((button_text_property as NodePath)).set(
 					(button_text_property as NodePath).get_concatenated_subnames(),
 					text)
-			buttons[i].connect("pressed", self, "_on_button_pressed", [i, event_id])
+			buttons[i].connect("pressed", self, "_on_button_pressed", [i + 1, event_id])
 		if event.choose_time  > 0.0:
 			timer.start(event.choose_time)
 			time_bar.visible = true
@@ -87,6 +88,7 @@ func _on_button_pressed(idx: int, event: String) -> void:
 func _reset_buttons() -> void:
 	for i in button_overrides:
 		if i:
+			i = get_node(i)
 			i.disconnect("pressed", self, "_on_button_pressed")
 			i.visible = false
 	for i in button_container.get_children():
