@@ -19,7 +19,7 @@ func _compile_regex() -> void:
 	#fetches the text up to the current bracket
 	var outer := "(?<outer>[\\w\\W]*?)"
 	
-	#fetches the content of a bracket without a /another nested bracked inside
+	#fetches the content of a bracket
 	var inner := "(?<inner>(?:[^\\{\\}]|\"(?:[^\"]|\\\\\")*\")*?)"
 	if _regex_brackets.compile(outer + "{\\s*" + inner + "\\s*}") != OK:
 		printerr("failed to compile _regex_brackets")
@@ -48,7 +48,8 @@ func format_text(text: String, replace_new_lines := false) -> Array:
 	text += "{wait()}"
 	var lines := []
 	if replace_new_lines:
-		text = text.replace("\n", "{end_line()}")#todo: use regix to ignore escaped
+		text = text.replace("\n", "{end_line()}")
+	text = text.replace("\\\n", "\n")
 	for i in _regex_brackets.search_all(text):
 		lines.append({"text": i.get_string("outer").format(variables, "<_>")})
 		lines.append_array(_handle_bracket(i.get_string("inner")))
@@ -83,7 +84,7 @@ func _handle_bracket(line: String) -> Array:
 			actions[-1].append_array(tmp)
 		else:
 			weights[-1].append_array(tmp)
-			
+	
 	var total_weight = 0
 	for j in weights.size():
 		if weights[j]:
