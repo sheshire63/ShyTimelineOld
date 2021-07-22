@@ -1,10 +1,18 @@
-[gd_scene load_steps=6 format=2]
+[gd_scene load_steps=8 format=2]
 
 [ext_resource path="res://addons/ShyTimeline/Nodes/Timeline.gd" type="Script" id=1]
 [ext_resource path="res://addons/ShyTimeline/Nodes/TimelineChoiceHandler.gd" type="Script" id=2]
 [ext_resource path="res://ExampleTimeline.tres" type="Resource" id=3]
 [ext_resource path="res://Example.gd" type="Script" id=4]
 [ext_resource path="res://addons/ShyTimeline/Nodes/TimelineTextHandler.gd" type="Script" id=5]
+[ext_resource path="res://addons/ShyTimeline/TimelineRes.gd" type="Script" id=6]
+
+[sub_resource type="Resource" id=1]
+script = ExtResource( 6 )
+events = {
+}
+start_event = ""
+name = ""
 
 [node name="Example" type="Control"]
 anchor_right = 1.0
@@ -44,5 +52,6 @@ __meta__ = {
 
 [node name="Timeline2" type="Node" parent="."]
 script = ExtResource( 1 )
+timeline_res = SubResource( 1 )
 settings = {
 }

@@ -113,7 +113,7 @@ func _add_up_values(actions: Array):
 				match actions[0].get_string("action"):
 					"default":
 						if value_b == null:
-							value_b = _handle_bracket(actions[0].get_string("arg"))
+							value_b = actions[0].get_string("arg")
 					"type":
 						match actions[0].get_string("arg"):
 							"int":
@@ -196,7 +196,7 @@ func _add_up_values(actions: Array):
 					if value_b is String:
 						value_a = value_a.length() < value_b.length()
 					else:
-						value_a = value_a.length < float(value_b)
+						value_a = value_a.length() < float(value_b)
 				else:
 					value_a = float(value_a) < float(value_b)
 			">":
@@ -204,7 +204,7 @@ func _add_up_values(actions: Array):
 					if value_b is String:
 						value_a = value_a.length() > value_b.length()
 					else:
-						value_a = value_a.length > float(value_b)
+						value_a = value_a.length() > float(value_b)
 				else:
 					value_a = float(value_a) > float(value_b)
 			"<=":
@@ -212,7 +212,7 @@ func _add_up_values(actions: Array):
 					if value_b is String:
 						value_a = value_a.length() <= value_b.length()
 					else:
-						value_a = value_a.length <= float(value_b)
+						value_a = value_a.length() <= float(value_b)
 				else:
 					value_a = float(value_a) <= float(value_b)
 			">=":
@@ -220,7 +220,7 @@ func _add_up_values(actions: Array):
 					if value_b is String:
 						value_a = value_a.length() >= value_b.length()
 					else:
-						value_a = value_a.length >= float(value_b)
+						value_a = value_a.length() >= float(value_b)
 				else:
 					value_a = float(value_a) >= float(value_b)
 			"<>":
@@ -228,7 +228,7 @@ func _add_up_values(actions: Array):
 					if value_b is String:
 						value_a = value_a.length() != value_b.length()
 					else:
-						value_a = value_a.length != float(value_b)
+						value_a = value_a.length() != float(value_b)
 				else:
 					value_a = float(value_a) != float(value_b)
 			"<<":
