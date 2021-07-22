@@ -20,7 +20,7 @@ func _compile_regex() -> void:
 	var outer := "(?<outer>[\\w\\W]*?)"
 	
 	#fetches the content of a bracket without a /another nested bracked inside
-	var inner := "(?<inner>(?:\\\\[\\{\\}]|[^\\{\\}])*?)"
+	var inner := "(?<inner>(?:[^\\{\\}]|\"(?:[^\"]|\\\\\")*\")*?)"
 	if _regex_brackets.compile(outer + "{\\s*" + inner + "\\s*}") != OK:
 		printerr("failed to compile _regex_brackets")
 	
@@ -33,24 +33,24 @@ func _compile_regex() -> void:
 	var integer := "(?<int>\\-?\\d+)"
 	var real := "(?<float>\\-?\\d+\\.\\d+)"
 	var boolean := "(?<bool>(?:[Tt]rue)|[[Ff]alse])"
-	var action := "(?<action>\\w+)\\((?<arg>[\\w\\W]*?)\\)"
-	var variable := "(?:<(?<var>\\w+)>" + action + "?)"
+	var action := "(?<action>[\\w_]+)\\((?<arg>[\\w\\W]*?)\\)"
+	var setting := "((?<setting>[\\w_]+)(?:\\." + action + "))"
+	var variable := "(?:<(?<var>[\\w_]+)>(?:\\." + action + ")?)"
 	var nested := "(?<nested_recursion>\\((?<nested>(?:[^\\(\\)]|\\g'nested_recursion')*)\\))"
-	if _regex_subsegments.compile("\\G\\s*(?:(?<operator>[\\W]{1,3})\\s*)?(?:"
-			+ text + "|" + variable + "|" + real + "|"+ integer + "|" + boolean + "|" + action
+	if _regex_subsegments.compile("\\G\\s*(?:(?<operator>[\\+\\-*/=|&%]{1,3})\\s*)?(?:"
+			+ text + "|" + variable + "|" + real + "|"+ integer
+			+ "|" + boolean + "|" + setting + "|" + action
 			+ ")") != OK:
 		printerr("failed to compile _regex_subsegments")
 
 
 func format_text(text: String, replace_new_lines := false) -> Array:
-	var override_settings := {}
 	text += "{wait()}"
 	var lines := []
 	if replace_new_lines:
 		text = text.replace("\n", "{end_line()}")#todo: use regix to ignore escaped
 	for i in _regex_brackets.search_all(text):
-		lines.append({"text": i.get_string("outer")})
-		#segment["operator"] = i.get_string("operator")
+		lines.append({"text": i.get_string("outer").format(variables, "<_>")})
 		lines.append_array(_handle_bracket(i.get_string("inner")))
 	return lines
 
@@ -109,6 +109,25 @@ func _add_up_values(actions: Array):
 		var value_b
 		if actions[0].get_string("var") != "":
 			value_b = variables.get(actions[0].get_string("var"))
+			if actions[0].get_string("action") != "":
+				match actions[0].get_string("action"):
+					"default":
+						if value_b == null:
+							value_b = _handle_bracket(actions[0].get_string("arg"))
+					"type":
+						match actions[0].get_string("arg"):
+							"int":
+								value_b = int(value_b)
+							"bool":
+								value_b = bool(value_b)
+							"float":
+								value_b = float(value_b)
+							"string":
+								value_b = str(value_b)
+#		elif actions[0].get_string("setting") != "":
+#			pass#todo
+#		elif actions[0].get_string("action") != "":
+#			pass#todo
 		elif actions[0].get_string("int") != "":
 			value_b = int(actions[0].get_string("int"))
 		elif actions[0].get_string("float") != "":
@@ -120,25 +139,9 @@ func _add_up_values(actions: Array):
 		else:
 			value_b = actions[0].get_string("text")
 
-		if actions[0].get_string("action") != "":
-			match actions[0].get_string("action"):
-				"default":
-					if value_b == null:
-						value_b = _handle_bracket(actions[0].get_string("arg"))
-				"type":
-					match actions[0].get_string("arg"):
-						"int":
-							value_b = int(value_b)
-						"bool":
-							value_b = bool(value_b)
-						"float":
-							value_b = float(value_b)
-						"string":
-							value_b = str(value_b)
+
 		# add up:
 		match action:
-			"":
-				value_a = value_b
 			"+":
 				if value_a is String:
 					value_a += str(value_b)
@@ -233,7 +236,7 @@ func _add_up_values(actions: Array):
 			">>":
 				value_a = value_a >> int(value_b)
 			_:
-				return value_a
+				return value_b
 		actions.pop_front()
 	return value_a
 
@@ -248,9 +251,10 @@ func _handle_actions(actions: Array) -> Array:
 				_:
 					entry.action = action
 					entry.value = actions[0].get_string("arg")
-		elif actions[0].get_string("operator") in _SET_VAR_OPERATORS:
+					entry.setting = actions[0].get_string("setting")
+		elif actions.size() > 1 and actions[1].get_string("operator") in _SET_VAR_OPERATORS:
 			var variable = actions[0].get_string("var")
-			var operator = actions[0].get_string("operator")
+			var operator = actions[1].get_string("operator")
 			actions.pop_front()
 			var value = _add_up_values(actions)
 			match typeof(variables.get(variable)):
@@ -278,7 +282,7 @@ func _handle_actions(actions: Array) -> Array:
 				"//=":
 					variables[variable] = pow(variables[variable], 1 / value)
 		else:
-			entry.text = _add_up_values(actions)
+			result.append_array(format_text(_add_up_values(actions)))
 		result.append(entry)
 		actions.pop_front()
 	return result

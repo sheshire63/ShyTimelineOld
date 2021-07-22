@@ -64,7 +64,7 @@ func _exit_tree() -> void:
 
 
 func make_visible(visible: bool) -> void:
-	if timeline_editor and !get_editor_interface().is_playing_scene():
+	if timeline_editor:
 		timeline_editor.visible = visible
 
 
@@ -85,5 +85,7 @@ func handles(object: Object) -> bool:
 
 
 func edit(object: Object) -> void:
-	if object is Timeline and object.timeline_res:
+	if object is Timeline:
 		timeline_editor.timeline = object.timeline_res
+		if get_editor_interface().is_playing_scene() and timeline_editor.visible == false:
+			get_editor_interface().set_main_screen_editor("Script")

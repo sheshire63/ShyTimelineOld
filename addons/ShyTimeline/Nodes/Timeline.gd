@@ -12,7 +12,7 @@ signal handle_event_rollback #for rollback
 signal handle_event_rollforward
 signal stop_all
 
-export var timeline_res: Resource = TimelineRes.new()
+var timeline_res := TimelineRes.new()
 export var autostart := false
 export var settings := {}
 
@@ -24,14 +24,13 @@ var is_active := false
 var c := 1
 
 
-#func _get_property_list() -> Array:
-#	return[{
-#		name = "timeline_res",
-#		type = TYPE_OBJECT,
-#		hint = PROPERTY_HINT_RESOURCE_TYPE,
-#		hint_string = "TimelineRes"
-#
-#	}]
+func _get_property_list() -> Array:
+	return[{
+		name = "timeline_res",
+		type = TYPE_OBJECT,
+		hint = PROPERTY_HINT_RESOURCE_TYPE,
+		hint_string = "TimelineRes"
+	}]
 
 
 func _ready() -> void:

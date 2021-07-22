@@ -1,22 +1,13 @@
-[gd_resource type="Resource" load_steps=6 format=2]
+[gd_resource type="Resource" load_steps=7 format=2]
 
 [ext_resource path="res://addons/ShyTimeline/Events/Text.gd" type="Script" id=1]
 [ext_resource path="res://addons/ShyTimeline/TimelineRes.gd" type="Script" id=2]
 [ext_resource path="res://addons/ShyTimeline/Events/Choice.gd" type="Script" id=3]
 
 [sub_resource type="Resource" id=1]
-script = ExtResource( 1 )
-next_events = {
-0: [ "ChoiceEvent" ]
-}
-pos = Vector2( -520, 260 )
-channel = ""
-text = "Test"
-
-[sub_resource type="Resource" id=2]
 script = ExtResource( 3 )
 next_events = {
-0: [  ],
+0: [ "TextEvent" ],
 1: [  ],
 2: [  ],
 3: [  ]
@@ -30,11 +21,34 @@ choice_text = {
 }
 choose_time = 0.0
 
+[sub_resource type="Resource" id=2]
+script = ExtResource( 1 )
+next_events = {
+0: [ "ChoiceEvent" ]
+}
+pos = Vector2( -520, 260 )
+channel = ""
+text = "{<player> = \"Lin\"}
+Test
+<player>
+{<player>, \"you\" <player> = \"Shy\"}
+<player>"
+
+[sub_resource type="Resource" id=3]
+script = ExtResource( 1 )
+next_events = {
+0: [  ]
+}
+pos = Vector2( 140, 320 )
+channel = ""
+text = ""
+
 [resource]
 script = ExtResource( 2 )
 events = {
-"ChoiceEvent": SubResource( 2 ),
-"Start": SubResource( 1 )
+"ChoiceEvent": SubResource( 1 ),
+"Start": SubResource( 2 ),
+"TextEvent": SubResource( 3 )
 }
 start_event = "Start"
 name = ""

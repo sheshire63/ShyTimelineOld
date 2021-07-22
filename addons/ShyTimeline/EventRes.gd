@@ -2,8 +2,6 @@ extends Resource
 tool
 
 
-#export var name := ""# do we need this?
-#export var data := {} # use attributes in the childevents instead for handling in the editor
 export var next_events := {0 : []}
 export var pos := Vector2.ZERO
 export var channel := ""
@@ -21,3 +19,14 @@ func create_control(id: int) -> Control:
 
 func slot_removed(idx: int) -> void:
 	pass
+
+"""
+throw event res out and just create an dictionary? in a new class?
+	pro:
+		better saving behavior / subresources somehow dont get saved automaticly
+	
+	contra
+		how to edit them / inspector will not realy work then
+make them objects instead of resource?
+		
+#"""

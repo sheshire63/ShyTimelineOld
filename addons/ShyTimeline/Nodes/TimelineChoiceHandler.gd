@@ -89,7 +89,8 @@ func _reset_buttons() -> void:
 	for i in button_overrides:
 		if i:
 			i = get_node(i)
-			i.disconnect("pressed", self, "_on_button_pressed")
+			if i.is_connected("pressed", self, "_on_button_pressed"):
+				i.disconnect("pressed", self, "_on_button_pressed")
 			i.visible = false
 	for i in button_container.get_children():
 		if not i is Range:

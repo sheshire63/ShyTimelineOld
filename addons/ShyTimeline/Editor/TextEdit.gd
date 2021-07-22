@@ -48,6 +48,7 @@ ideas:
 func _on_TextEdit_text_changed() -> void:
 	if event:
 		event.text = text.text
+		ResourceSaver.save(event.resource_path, event)
 	else:
 		printerr("no event to save to")
 

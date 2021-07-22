@@ -6,7 +6,7 @@ onready var text_edit = $VBox/HSplitContainer/TextEditor
 onready var global_vars_button = $VBox/HBoxContainer/GlobalVars
 
 onready var timeline: Resource setget set_timeline
-var selected_event : Resource
+var selected_event : Object
 
 
 func _ready() -> void:
@@ -23,7 +23,7 @@ func set_timeline(new) -> void:
 
 func _on_GraphEdit_node_selected(node: Node) -> void:
 	selected_event = node.event
-	if selected_event is preload("res://addons/ShyTimeline/Events/Text.gd"):
+	if selected_event.get_node_type() == "TextEvent":
 		text_edit.event = selected_event
 	text_edit.visible = true
 
