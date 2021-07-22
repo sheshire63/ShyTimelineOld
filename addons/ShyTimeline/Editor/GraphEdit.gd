@@ -36,18 +36,14 @@ func load_timeline(new) -> void:
 		node.name = i
 		for j in node.event.next_events:
 			for k in node.event.next_events[j]:
-				print(node.event.next_events)
-				print([i, j, k])
 				call_deferred("connect_node", i, j, k, 0)
 
 
 func _on_node_change_name_request(new: String, sender) -> void:
 	var old = sender.name
 	var event = timeline.events[old]
-	new = timeline.get_unique_name(new)
-	sender.name = new
+	new = timeline.add_event(sender, new)
 	timeline.events.erase(old)
-	timeline.events[new] = event
 	for i in get_connection_list():
 		if i.from == old:
 			disconnect_node(i.from, i.from_port, i.to, i.to_port)
@@ -62,11 +58,10 @@ func _on_menu_item_pressed(id: int) -> void:
 	var node = _create_node(event)
 	node.offset = (scroll_offset + get_local_mouse_position()) / zoom
 	add_child(node)
-	node.name = timeline.get_unique_name(event.get_node_type())
-	timeline.events[node.name] = event
+	timeline.add_event(event.get_node_type())
 
 
-func _on_GraphEdit_connection_from_empty(to: String, to_slot: int, release_position: Vector2) -> void:
+func _on_GraphEdit_connection_from_empty(to: String, to_slot: int, position: Vector2) -> void:
 	pass # Replace with function body.
 
 
@@ -75,7 +70,7 @@ func _on_GraphEdit_connection_request(from: String, from_slot: int, to: String, 
 	timeline.events[from].next_events[from_slot].append(to)
 
 
-func _on_GraphEdit_connection_to_empty(from: String, from_slot: int, release_position: Vector2) -> void:
+func _on_GraphEdit_connection_to_empty(from: String, from_slot: int, position: Vector2) -> void:
 	pass # Replace with function body.
 
 

@@ -26,13 +26,15 @@ script = ExtResource( 1 )
 next_events = {
 0: [ "ChoiceEvent" ]
 }
-pos = Vector2( -520, 260 )
+pos = Vector2( -480, 260 )
 channel = ""
 text = "{<player> = \"Lin\"}
 Test
 <player>
 {<player>, \"you\" <player> = \"Shy\"}
-<player>"
+<player>
+this is a test to test stuff and it does not work
+"
 
 [sub_resource type="Resource" id=3]
 script = ExtResource( 1 )

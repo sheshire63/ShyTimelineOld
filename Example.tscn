@@ -16,10 +16,10 @@ __meta__ = {
 
 [node name="Timeline" type="Node" parent="."]
 script = ExtResource( 1 )
+timeline_res = ExtResource( 3 )
 autostart = true
 settings = {
 }
-timeline_res = ExtResource( 3 )
 
 [node name="ChoiceHandler" type="Node" parent="Timeline"]
 script = ExtResource( 2 )
@@ -46,4 +46,3 @@ __meta__ = {
 script = ExtResource( 1 )
 settings = {
 }
-timeline_res = null

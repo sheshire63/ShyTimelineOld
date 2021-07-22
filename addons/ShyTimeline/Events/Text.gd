@@ -11,4 +11,4 @@ func get_node_type() -> String:
 
 func _set_text(new) -> void:
 	text = new
-
+	emit_changed()

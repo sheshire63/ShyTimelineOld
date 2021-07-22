@@ -102,7 +102,7 @@ text = "Select a Node to change parameters"
 margin_left = 824.0
 margin_right = 1024.0
 margin_bottom = 14.0
-custom_colors/font_color = Color( 0, 0, 0, 0.247059 )
+custom_colors/font_color = Color( 0.564706, 0.564706, 0.564706, 1 )
 text = "Shy Timeline made by Sheshire"
 align = 1
 

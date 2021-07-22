@@ -4,12 +4,19 @@ tool
 class_name TimelineRes, "res://addons/ShyTimeline/Icons/Timeline.png"
 
 
-export var events := {}
+export var events := {} setget _set_events
 export var start_event := ""
 export var name := ""
 
 
-func get_unique_name(base) -> String:
+func _set_events(new) -> void:
+	events = new
+	for i in events:
+		if not events[i].is_connected("changed", self, "_on_event_changed"):
+			events[i].connect("changed", self, "_on_event_changed", [events[i]])
+
+
+func get_unique_name(base: String) -> String:
 	base = base.validate_node_name()
 	if base in events.keys():
 		var c = 0
@@ -18,3 +25,16 @@ func get_unique_name(base) -> String:
 				c = max(c, int(i))
 		return "%s%04d"%[base, c + 1]
 	return base
+
+
+func add_event(new: Resource, name: String) -> String:
+	name = get_unique_name(name)
+	new.name = name
+	new.connect("changed", self, "_on_event_changed", [new])
+	events[name] = new
+	return name
+
+
+func _on_event_changed(event: Resource) -> void:
+	ResourceSaver.save(event.resource_path, event)
+	ResourceSaver.save(resource_path, self)

@@ -5,6 +5,7 @@ tool
 export var choice_text := {}
 export var choose_time := 0.0
 
+
 func get_node_type() -> String:
 	return "ChoiceEvent"
 
@@ -18,6 +19,7 @@ func create_control(id: int) -> Control:
 
 func _on_text_changed(new: String, slot: int) -> void:
 	choice_text[slot] = new
+	emit_changed()
 
 
 func slot_removed(idx) -> void:
