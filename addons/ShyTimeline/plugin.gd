@@ -3,33 +3,21 @@ extends EditorPlugin
 
 
 var timeline_editor: Control = load("res://addons/ShyTimeline/Editor/TimelineEditor.tscn").instance()
-var timeline_node: Script = load("res://addons/ShyTimeline/Nodes/Timeline.gd")
-var handler_base: Script = load("res://addons/ShyTimeline/Nodes/TimelineBaseHandler.gd")
-var handler_choice: Script = load("res://addons/ShyTimeline/Nodes/TimelineChoiceHandler.gd")
-var handler_text : Script = load("res://addons/ShyTimeline/Nodes/TimelineTextHandler.gd")
-var timeline_res: Script = load("res://addons/ShyTimeline/TimelineRes.gd")
 var timeline_image: Texture = preload("res://addons/ShyTimeline/Icons/Timeline.png")
-var setting_path := "res://addons/ShyTimeline/Globals/Settings.gd"
-var variabels_path := "res://addons/ShyTimeline/Globals/Vars.gd"
-var saves_path := "res://addons/ShyTimeline/Globals/Saves.gd"
-#todo to dictionarys to have names and paths at the top and less code
+var autoloads = {
+	"Settings" : "res://addons/ShyTimeline/Globals/Settings.gd",
+	"Variabels" : "res://addons/ShyTimeline/Globals/Vars.gd",
+	"Saves" : "res://addons/ShyTimeline/Globals/Saves.gd",
+}
 
 
 func _enter_tree() -> void:
-#	add_custom_type("Timeline" ,"Node", timeline_node, timeline_image)
-#	add_custom_type("TextHandler" ,"Node", handler_text, timeline_image)
-#	add_custom_type("BaseHandler" ,"Node", handler_base, timeline_image)
-#	add_custom_type("ChoiceHandler" ,"Node", handler_choice, timeline_image)
-	add_custom_type("TimelineRes", "Resource", timeline_res, timeline_image)
 	get_editor_interface().get_editor_viewport().add_child(timeline_editor)
-	add_autoload_singleton("Settings", setting_path)
-	add_autoload_singleton("Variables", variabels_path)
-	add_autoload_singleton("Saves", saves_path)
-	
+	for i in autoloads:
+		add_autoload_singleton(i , autoloads[i])
+	for i in Settings.settings:
+		add_setting(i, Settings.settings[i])
 	make_visible(false)
-	var settings = load(setting_path)
-	for i in settings.settings:
-		add_setting(i, settings.settings[i])
 	ProjectSettings.save()
 
 
@@ -49,7 +37,7 @@ func remove_setting(setting: String) -> void:
 
 
 func disable_plugin() -> void:
-	for i in load(setting_path).settings:
+	for i in Settings.settings:
 		remove_setting(i)
 	ProjectSettings.save()
 
@@ -81,7 +69,7 @@ func get_plugin_icon():
 
 
 func handles(object: Object) -> bool:
-	return object is timeline_node
+	return object is Timeline
 
 
 func edit(object: Object) -> void:

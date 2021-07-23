@@ -126,9 +126,9 @@ func _add_up_values(actions: Array):
 							"string":
 								value_b = str(value_b)
 #		elif actions[0].get_string("setting") != "":
-#			pass#todo
+#			pass#handeld in _handle_action
 #		elif actions[0].get_string("action") != "":
-#			pass#todo
+#			pass#handeld in _handle_action
 		elif actions[0].get_string("int") != "":
 			value_b = int(actions[0].get_string("int"))
 		elif actions[0].get_string("float") != "":

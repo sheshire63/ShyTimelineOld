@@ -52,7 +52,7 @@ func _on_handle_event(event: Resource, event_id: String, id: int) -> void:
 		if interrupt:
 			_start_handle(event, event_id, id)
 			tween.stop_all()
-			tween.emit_signal("tween_all_completed")#todo to stop function
+			tween.emit_signal("tween_all_completed")
 			timer.stop()
 		else:
 			_queue.append({"event": event, "event_id": event_id, "id": id})
