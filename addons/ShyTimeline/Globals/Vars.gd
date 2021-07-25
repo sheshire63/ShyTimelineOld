@@ -92,7 +92,7 @@ func _handle_bracket(line: String) -> Array:
 			total_weight += weights[j]
 	var defaults = weights.count([])
 	for j in weights.size():
-		if weights[j] == []:
+		if weights[j] is Array:
 			weights[j] = max(0.0, (1.0 - total_weight) / defaults)
 	var random = rand_range(0.0, total_weight)
 	for j in weights.size():

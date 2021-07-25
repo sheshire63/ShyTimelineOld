@@ -6,7 +6,7 @@ var timeline_editor: Control = load("res://addons/ShyTimeline/Editor/TimelineEdi
 var timeline_image: Texture = preload("res://addons/ShyTimeline/Icons/Timeline.png")
 var autoloads = {
 	"Settings" : "res://addons/ShyTimeline/Globals/Settings.gd",
-	"Variabels" : "res://addons/ShyTimeline/Globals/Vars.gd",
+	"Variables" : "res://addons/ShyTimeline/Globals/Vars.gd",
 	"Saves" : "res://addons/ShyTimeline/Globals/Saves.gd",
 }
 

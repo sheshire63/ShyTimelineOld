@@ -58,7 +58,7 @@ func _on_menu_item_pressed(id: int) -> void:
 	var node = _create_node(event)
 	node.offset = (scroll_offset + get_local_mouse_position()) / zoom
 	add_child(node)
-	timeline.add_event(event)
+	node.name = timeline.add_event(event)
 
 
 func _on_GraphEdit_connection_from_empty(to: String, to_slot: int, position: Vector2) -> void:
