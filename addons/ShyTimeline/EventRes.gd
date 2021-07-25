@@ -7,7 +7,7 @@ export var pos := Vector2.ZERO
 export var channel := ""
 
 
-func get_node_type() -> String:
+static func get_node_type() -> String:
 	return "BaseNode"
 
 

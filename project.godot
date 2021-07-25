@@ -63,7 +63,7 @@ config/icon="res://icon.png"
 [autoload]
 
 Settings="*res://addons/ShyTimeline/Globals/Settings.gd"
-Variables="*res://addons/ShyTimeline/Globals/Vars.gd"
+Variabels="*res://addons/ShyTimeline/Globals/Vars.gd"
 Saves="*res://addons/ShyTimeline/Globals/Saves.gd"
 
 [editor_plugins]

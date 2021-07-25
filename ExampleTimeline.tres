@@ -15,7 +15,7 @@ next_events = {
 pos = Vector2( -200, 340 )
 channel = ""
 choice_text = {
-1: "alpha",
+1: "Chances",
 2: "beta",
 3: "gamma"
 }
@@ -33,7 +33,8 @@ Test
 <player>
 {<player>, \"you\" <player> = \"Shy\"}
 <player>
-this is a test to test stuff and it does not work
+this is a test to test stuff and it does now work
+
 "
 
 [sub_resource type="Resource" id=3]

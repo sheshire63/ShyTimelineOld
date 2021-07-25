@@ -44,11 +44,8 @@ func disable_plugin() -> void:
 
 func _exit_tree() -> void:
 	timeline_editor.queue_free()
-	remove_custom_type("Timeline")
-	remove_custom_type("TimelineRes")
-	remove_autoload_singleton("Variables")
-	remove_autoload_singleton("Settings")
-	remove_autoload_singleton("Saves")
+	for i in autoloads:
+		remove_autoload_singleton(i)
 
 
 func make_visible(visible: bool) -> void:
