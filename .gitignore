@@ -5,3 +5,8 @@
 bin/
 build/
 lib/
+
+#custom
+*.minder
+addons/ShyTimeline/readme.gd
+.directory
