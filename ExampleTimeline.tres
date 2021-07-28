@@ -62,7 +62,7 @@ next_events = {
 }
 pos = Vector2( 120, 400 )
 channel = ""
-text = "{\"alpha\" 0.0, \"beta\"}"
+text = "{\"alpha\" 0.5, \"beta\"}"
 
 [resource]
 script = ExtResource( 2 )

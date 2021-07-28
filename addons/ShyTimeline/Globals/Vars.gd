@@ -26,7 +26,8 @@ func _compile_regex() -> void:
 		printerr("failed to compile _regex_brackets")
 	
 	#splits into segments divided by ",".ignores strings
-	if _regex_segments.compile("((?:[^\\\\]\"[\\w\\W]*?[^\\\\]\"|[^,])*),") != OK:
+	if _regex_segments.compile("((?:(?:[^\\\\]?|(?:\\\\\\\\)+)\"[\\w\\W]*?(?:[^\\\\]?|(?:\\\\\\\\)+)\"|[^,])*),") != OK:#bug \\" will not work(an escaped backslash before the ")
+		#check regex for even times
 		printerr("failed to compile _regex_segments")
 	
 	#splits segments into values and operators
