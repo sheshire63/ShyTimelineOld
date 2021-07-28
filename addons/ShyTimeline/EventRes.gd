@@ -17,16 +17,29 @@ func create_control(id: int) -> Control:
 	return new
 
 
+func save() -> Dictionary:
+	var data = {}
+	data.position = pos
+	data.events = next_events
+	data.channel = channel
+	data.data = _save()
+	return data
+
+
+func load(data: Dictionary) -> void:
+	pos = data.get("position", pos)
+	next_events = data.get("events", next_events)
+	channel = data.get("channel", channel)
+	_load(data.get("data", {}))
+
+
 func slot_removed(idx: int) -> void:
 	pass
 
-"""
-throw event res out and just create an dictionary? in a new class?
-	pro:
-		better saving behavior / subresources somehow dont get saved automaticly
-	
-	contra
-		how to edit them / inspector will not realy work then
-make them objects instead of resource?
-		
-#"""
+
+func _load(data: Dictionary) -> void:
+	pass
+
+
+func _save() -> Dictionary:
+	return {}

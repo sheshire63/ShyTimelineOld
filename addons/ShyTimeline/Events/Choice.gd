@@ -24,3 +24,16 @@ func _on_text_changed(new: String, slot: int) -> void:
 
 func slot_removed(idx) -> void:
 	choice_text.erase(idx)
+
+
+func _load(data: Dictionary) -> void:
+	choice_text = data.get("text", choice_text)
+	choose_time = data.get("time", choose_time)
+
+
+func _save() -> Dictionary:
+	return{
+		"text": choice_text,
+		"time": choose_time
+	}
+	return {}

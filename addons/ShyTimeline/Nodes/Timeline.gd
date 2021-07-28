@@ -12,7 +12,7 @@ signal handle_event_rollback #for rollback
 signal handle_event_rollforward
 signal stop_all
 
-export var timeline_res: Resource = TimelineRes.new()
+export var timeline_res: Resource = TimelineRes.new() setget _set_timeline
 export var autostart := false
 export var settings := {}
 
@@ -51,12 +51,7 @@ func _process(_delta: float) -> void:
 	if event_queue.empty() and active_events.empty():
 		emit_signal("finished")
 		is_active = false
-		#print_debug("Timeline Finished: %s"%timeline_res.name)
-
-
-func next() -> void:
-	if active_events:
-		event_handled(active_events[0])
+		print_debug("Timeline Finished: %s"%timeline_res.name)
 
 
 """
@@ -85,9 +80,7 @@ func event_handled(event: String) -> void:
 
 
 func _unhandled_key_input(input_event: InputEventKey) -> void:
-	if input_event.is_action_pressed(get_setting("next_event_action")):
-		next()
-	elif input_event.is_action_pressed("ui_up"):
+	if input_event.is_action_pressed("ui_up"):
 		if history:
 			if !future:
 				future.append(history.pop_back())#skip the current event
@@ -99,7 +92,7 @@ func _unhandled_key_input(input_event: InputEventKey) -> void:
 				future.append(item)
 				do = not event.get_node_type() in Rollback_stop_events and history
 			
-	elif input_event.is_action_pressed("ui_down"):
+	if input_event.is_action_pressed("ui_down"):
 		if future:
 			if !history:
 				history.append(future.pop_back())
@@ -113,20 +106,21 @@ func _unhandled_key_input(input_event: InputEventKey) -> void:
 				do = not event.get_node_type() in Rollback_stop_events and future
 
 
-#"""
-#adds a event manualy to the queue
-#intended if the handler pauses and should continue on the next event call
-#"""
-#func queue(id: String) -> void:#if handler gets a new event before it gets the queued one it will restart. remove from queue func?
-#	event_queue.append(id)
-#
-#
-#"""
-#removes a event manualy from the queue
-#intended to remove an event added by queue()
-#"""
-#func remove_from_queue(id: String) -> void:
-#	event_queue.erase(id)
+"""
+adds a event manualy to the queue
+intended if the handler pauses and should continue on the next event call
+"""
+func queue(id: String) -> void:
+	event_queue.append(id)
+	is_active = true
+
+
+"""
+removes a event manualy from the queue
+intended to remove an event added by queue()
+"""
+func remove_from_queue(id: String) -> void:
+	event_queue.erase(id)
 
 
 """
@@ -166,3 +160,9 @@ func load_state() -> void:
 	active_events = state.get("active_events", [])
 	event_queue = state.get("event_queue", [])
 	c = state.get("counter")
+
+
+func _set_timeline(new) -> void:
+	timeline_res = new
+	active_events = []
+	event_queue = []

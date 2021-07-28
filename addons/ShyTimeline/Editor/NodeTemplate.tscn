@@ -42,6 +42,7 @@ margin_right = 224.0
 margin_bottom = 32.0
 text = "-"
 
+[connection signal="close_request" from="." to="." method="_on_Node_close_request"]
 [connection signal="offset_changed" from="." to="." method="_on_Node_offset_changed"]
 [connection signal="renamed" from="." to="." method="_on_Node_renamed"]
 [connection signal="focus_exited" from="HBoxContainer/Label" to="." method="_on_Label_focus_exited"]

@@ -8,11 +8,11 @@
 script = ExtResource( 3 )
 next_events = {
 0: [ "TextEvent" ],
-1: [ "TextEvent0001" ],
+1: [ "Choice" ],
 2: [  ],
 3: [  ]
 }
-pos = Vector2( -200, 340 )
+pos = Vector2( -240, 320 )
 channel = ""
 choice_text = {
 1: "Chances",
@@ -26,7 +26,7 @@ script = ExtResource( 1 )
 next_events = {
 0: [ "ChoiceEvent" ]
 }
-pos = Vector2( -480, 260 )
+pos = Vector2( -560, 260 )
 channel = ""
 text = "{<player> = \"Lin\"}
 Test
@@ -46,31 +46,31 @@ pos = Vector2( 100, 240 )
 channel = ""
 text = "baum"
 
-[sub_resource type="Resource" id=4]
-script = ExtResource( 1 )
-next_events = {
-0: [ "TextEvent0001" ]
-}
-pos = Vector2( 120, 400 )
-channel = ""
-text = "{\"alpha\" 0.5, \"beta\"}"
-
 [sub_resource type="Resource" id=5]
 script = ExtResource( 1 )
 next_events = {
-0: [ "TextEvent0001" ]
+0: [ "Choice" ]
 }
-pos = Vector2( 120, 500 )
+pos = Vector2( -240, 500 )
 channel = ""
 text = ""
+
+[sub_resource type="Resource" id=4]
+script = ExtResource( 1 )
+next_events = {
+0: [ "Choice" ]
+}
+pos = Vector2( 120, 400 )
+channel = ""
+text = "{\"alpha\" 0.0, \"beta\"}"
 
 [resource]
 script = ExtResource( 2 )
 events = {
+"Choice": SubResource( 4 ),
 "ChoiceEvent": SubResource( 1 ),
 "Start": SubResource( 2 ),
 "TextEvent": SubResource( 3 ),
-"TextEvent0001": SubResource( 4 ),
 "TextEvent0002": SubResource( 5 )
 }
 start_event = "Start"

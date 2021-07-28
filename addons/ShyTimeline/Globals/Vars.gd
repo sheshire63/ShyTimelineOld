@@ -5,6 +5,7 @@ const _SET_VAR_OPERATORS := ["=", "+=", "*=", "-=", "/=", "**=", "//=", "=!"]
 var _regex_brackets := RegEx.new()# to get the content of brackets
 var _regex_segments := RegEx.new()# to get the seperate contents of regex 1
 var _regex_subsegments := RegEx.new()# to split the text in segments and setting commands
+var _regex_escaped_chars := RegEx.new()
 
 var variables := {
 	"player": "Lin",
@@ -42,6 +43,9 @@ func _compile_regex() -> void:
 			+ "|" + boolean + "|" + setting + "|" + action
 			+ ")") != OK:
 		printerr("failed to compile _regex_subsegments")
+	
+	if _regex_escaped_chars.compile("\\\\\\S") != OK:
+		printerr("failed to compile _regex_escaped_chars")
 
 
 func format_text(text: String, replace_new_lines := false) -> Array:
@@ -49,10 +53,16 @@ func format_text(text: String, replace_new_lines := false) -> Array:
 	var lines := []
 	if replace_new_lines:
 		text = text.replace("\n", "{end_line()}")
-	text = text.replace("\\\n", "\n")
 	for i in _regex_brackets.search_all(text):
 		lines.append({"text": i.get_string("outer").format(variables, "<_>")})
 		lines.append_array(_handle_bracket(i.get_string("inner")))
+	for i in lines.size():
+		if lines[i].has("text"):
+			lines[i].text = lines[i].text.replace("\\n", "\n")#also for other escpes(\s,\t)?
+			var regex_mach := _regex_escaped_chars.search(lines[i].text)
+			while regex_mach:
+				lines[i].text = text.erase(regex_mach.get_start(), 1)
+				regex_mach = _regex_escaped_chars.search(lines[i].text, regex_mach.get_start() + 1)
 	return lines
 
 
@@ -94,7 +104,7 @@ func _handle_bracket(line: String) -> Array:
 	for j in weights.size():
 		if weights[j] is Array:
 			weights[j] = max(0.0, (1.0 - total_weight) / defaults)
-	var random = rand_range(0.0, total_weight)
+	var random = rand_range(0.0, max(total_weight, 1.0))
 	for j in weights.size():
 		random -= weights[j]
 		if random <= 0.0:
