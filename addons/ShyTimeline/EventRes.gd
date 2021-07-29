@@ -19,15 +19,20 @@ func create_control(id: int) -> Control:
 
 func save() -> Dictionary:
 	var data = {}
-	data.position = pos
-	data.events = next_events
+	data.pos_x = pos.x
+	data.pos_y = pos.y
+	data.events = next_events.duplicate(true)
 	data.channel = channel
-	data.data = _save()
+	data.data = _save().duplicate(true)
+	data.type = get_node_type()
 	return data
 
 
 func load(data: Dictionary) -> void:
-	pos = data.get("position", pos)
+	var position := Vector2.ZERO
+	position.x = data.get("pos_x", pos.x)
+	position.y = data.get("pos_y", pos.y)
+	pos = position
 	next_events = data.get("events", next_events)
 	channel = data.get("channel", channel)
 	_load(data.get("data", {}))

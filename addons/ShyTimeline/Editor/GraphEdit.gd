@@ -32,11 +32,25 @@ func _ready() -> void:
 
 func load_timeline(new) -> void:
 	timeline = new
-	for i in timeline.events:
-		var node = _create_node(timeline.events[i])
-		node.offset = timeline.events[i].pos
+	_add_events(timeline.events)
+
+
+func _add_events(events: Dictionary, to_timeline := false) -> void:
+	var names = {}
+	if to_timeline:
+		for i in events:
+				if i in timeline.events:
+					names[i] = timeline.add_event(events[i], i)
+		for i in events:
+			for j in events[i].next_events:
+				for k in events[i].next_events[j]:
+					events[i].next_events[j][names[k]] = events[i].next_events[j][k]
+					events[i].next_events[j].erase([k])
+	for i in events:
+		var node = _create_node(events[i])
+		node.offset = events[i].pos
 		add_child(node)
-		node.name = i
+		node.name = names.get(i, i)
 		for j in node.event.next_events:
 			for k in node.event.next_events[j]:
 				call_deferred("connect_node", i, j, k, 0)
@@ -87,7 +101,11 @@ func _on_connection_to_empty(from: String, from_slot: int, position: Vector2) ->
 
 
 func _on_copy_nodes_request() -> void:
-	pass # Replace with function body.
+	var data = {}
+	for i in get_children():
+		if i is GraphNode and i.selected:
+			data[i.name] = i.event.save()
+	OS.clipboard = to_json(data)
 
 
 func _on_delete_nodes_request() -> void:
@@ -133,7 +151,17 @@ func _on_node_unselected(node: Node) -> void:
 
 
 func _on_paste_nodes_request() -> void:
-	pass # Replace with function body.
+	var data: Dictionary = parse_json(OS.clipboard)
+	var events := {}
+	if data:
+		for i in data:
+			for j in node_types:
+				if j.get_node_type() == data[i].type:
+					var tmp = j.new()
+					tmp.load(data[i])
+					events[i] = tmp
+					break
+		_add_events(events, true)
 
 
 func _on_popup_request(position: Vector2) -> void:
@@ -157,6 +185,7 @@ func _create_node(event: Resource) -> GraphNode:
 	var node = NODE.instance()
 	node.connect("request_name_change", self, "_on_node_change_name_request", [node])
 	node.connect("slot_updated", self, "_on_node_slot_updated", [node])
+	node.connect("close_request", self, "_delete_node", [node])
 	node.event = event
 	return node
 
