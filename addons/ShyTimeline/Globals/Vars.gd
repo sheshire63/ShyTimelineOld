@@ -52,6 +52,8 @@ func _compile_regex() -> void:
 func format_text(text: String, replace_new_lines := false, add_wait := true) -> Array:
 	if add_wait:
 		text += "{wait()}"
+	else:
+		text += "{}"
 	var lines := []
 	if replace_new_lines:
 		text = text.replace("\n", "{end_line()}")
