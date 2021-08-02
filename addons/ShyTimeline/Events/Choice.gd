@@ -6,7 +6,7 @@ export var choice_text := {}
 export var choose_time := 0.0
 
 
-static func get_node_type() -> String:
+static func get_event_type() -> String:
 	return "ChoiceEvent"
 
 

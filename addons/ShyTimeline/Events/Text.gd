@@ -5,7 +5,7 @@ tool
 export var text := "" setget _set_text
 
 
-static func get_node_type() -> String:
+static func get_event_type() -> String:
 	return "TextEvent"
 
 

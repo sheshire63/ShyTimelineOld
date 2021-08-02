@@ -40,6 +40,7 @@ func _ready() -> void:
 		text_label = RichTextLabel.new()
 		text_label.set_anchors_preset(Control.PRESET_WIDE)
 		var canvas = CanvasLayer.new()
+		text_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		add_child(canvas)
 		canvas.add_child(text_label)
 	add_child(tween)
@@ -48,7 +49,7 @@ func _ready() -> void:
 
 
 func _on_handle_event(event: Resource, event_id: String, id: int) -> void:
-	if event.get_node_type() == "TextEvent":
+	if event.get_event_type() == "TextEvent":
 		if interrupt:
 			_start_handle(event, event_id, id)
 			tween.stop_all()

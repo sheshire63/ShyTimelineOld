@@ -46,7 +46,7 @@ func _ready() -> void:
 
 
 func _on_handle_event(event: Resource, event_id: String, id: int) -> void:
-	if event.get_node_type() == "ChoiceEvent":
+	if event.get_event_type() == "ChoiceEvent":
 		is_active = true
 		var buttons = {}
 		for i in event.choice_text.size():

@@ -51,7 +51,7 @@ func _process(_delta: float) -> void:
 	if event_queue.empty() and active_events.empty():
 		emit_signal("finished")
 		is_active = false
-		print_debug("Timeline Finished: %s"%timeline_res.name)
+		print("Timeline Finished: %s"%timeline_res.name)
 
 
 """

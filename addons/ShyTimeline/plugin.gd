@@ -15,8 +15,8 @@ func _enter_tree() -> void:
 	get_editor_interface().get_editor_viewport().add_child(timeline_editor)
 	for i in autoloads:
 		add_autoload_singleton(i , autoloads[i])
-	for i in Settings.settings:
-		add_setting(i, Settings.settings[i])
+	for i in get_node("/root/Settings").settings:
+		add_setting(i, get_node("/root/Settings").settings[i])
 	make_visible(false)
 	ProjectSettings.save()
 
@@ -37,7 +37,7 @@ func remove_setting(setting: String) -> void:
 
 
 func disable_plugin() -> void:
-	for i in Settings.settings:
+	for i in get_node("/root/Settings").settings:
 		remove_setting(i)
 	ProjectSettings.save()
 

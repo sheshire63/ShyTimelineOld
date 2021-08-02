@@ -1,1 +1,9 @@
-/home/sheshire/Downloads/Tools/godot-git-plugin-v1.2.1-x11/git_api.gdns
+[gd_resource type="NativeScript" load_steps=2 format=2]
+
+[ext_resource path="res://git_api.gdnlib" type="GDNativeLibrary" id=1]
+
+[resource]
+resource_name = "GitAPI"
+class_name = "GitAPI"
+library = ExtResource( 1 )
+script_class_name = "GitAPI"

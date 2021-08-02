@@ -29,7 +29,7 @@ func get_unique_name(base: String) -> String:
 
 func add_event(new: Resource, name:= "") -> String:
 	if name == "":
-		name = new.get_node_type()
+		name = new.get_event_type()
 	name = get_unique_name(name)
 	if not new.is_connected("changed", self, "_on_event_changed"):
 		new.connect("changed", self, "_on_event_changed", [new])

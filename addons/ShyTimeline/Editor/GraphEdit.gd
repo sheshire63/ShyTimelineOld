@@ -2,7 +2,6 @@ extends GraphEdit
 tool
 
 const NODE_FOLDER = "res://addons/ShyTimeline/Events"
-const NODE := preload("res://addons/ShyTimeline/Editor/NodeTemplate.tscn")
 const DEFAULT_TIMELINE = "res://addons/ShyTimeline/TimelineRes.gd"
 
 var node_menu := PopupMenu.new()
@@ -44,7 +43,7 @@ func _add_events(events: Dictionary, to_timeline := false) -> void:
 		for i in events:
 			for j in events[i].next_events:
 				for k in events[i].next_events[j]:
-					events[i].next_events[j][names[k]] = events[i].next_events[j][k]
+					events[i].next_events[j][names[k]] = k
 					events[i].next_events[j].erase([k])
 	for i in events:
 		var node = _create_node(events[i])
@@ -138,7 +137,11 @@ func _on_disconnection_request(from: String, from_slot: int, to: String, to_slot
 
 
 func _on_duplicate_nodes_request() -> void:
-	pass # Replace with function body.
+	var data = {}
+	for i in get_children():
+		if i is GraphNode and i.selected:
+			data[i.name] = i.event
+	_add_events(data, true)
 
 
 func _on_node_selected(node: Node) -> void:
@@ -182,7 +185,7 @@ func _on_node_slot_updated(slot: int, node: GraphNode) -> void:
 
 
 func _create_node(event: Resource) -> GraphNode:
-	var node = NODE.instance()
+	var node = event.get_node()
 	node.connect("request_name_change", self, "_on_node_change_name_request", [node])
 	node.connect("slot_updated", self, "_on_node_slot_updated", [node])
 	node.connect("close_request", self, "_delete_node", [node])

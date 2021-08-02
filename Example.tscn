@@ -1,17 +1,46 @@
-[gd_scene load_steps=8 format=2]
+[gd_scene load_steps=11 format=2]
 
 [ext_resource path="res://addons/ShyTimeline/Nodes/Timeline.gd" type="Script" id=1]
 [ext_resource path="res://addons/ShyTimeline/Nodes/TimelineChoiceHandler.gd" type="Script" id=2]
-[ext_resource path="res://ExampleTimeline.tres" type="Resource" id=3]
 [ext_resource path="res://Example.gd" type="Script" id=4]
 [ext_resource path="res://addons/ShyTimeline/Nodes/TimelineTextHandler.gd" type="Script" id=5]
 [ext_resource path="res://addons/ShyTimeline/TimelineRes.gd" type="Script" id=6]
+[ext_resource path="res://addons/ShyTimeline/Events/Choice.gd" type="Script" id=7]
+[ext_resource path="res://addons/ShyTimeline/Events/Text.gd" type="Script" id=8]
+
+[sub_resource type="Resource" id=3]
+script = ExtResource( 8 )
+next_events = {
+0: [  ]
+}
+pos = Vector2( 240, -120 )
+channel = ""
+text = "This is a base Test for TextEvents
+including chances {\"a\",\"b\",\"c\",\"d\"}.
+weighted chances {\"a\" 0.5, \"b\" 0.25, \"c\" 0.2, \"d\"}
+variables <player>
+more to be added"
 
 [sub_resource type="Resource" id=1]
+script = ExtResource( 7 )
+next_events = {
+0: [  ],
+1: [ "TextEvent" ]
+}
+pos = Vector2( -80, -120 )
+channel = ""
+choice_text = {
+1: "Text"
+}
+choose_time = 0.0
+
+[sub_resource type="Resource" id=2]
 script = ExtResource( 6 )
 events = {
+"Start": SubResource( 1 ),
+"TextEvent": SubResource( 3 )
 }
-start_event = ""
+start_event = "Start"
 name = ""
 
 [node name="Example" type="Control"]
@@ -23,36 +52,19 @@ __meta__ = {
 }
 data.text = null
 
-[node name="Timeline" type="Node" parent="."]
+[node name="Timeline2" type="Node" parent="."]
 script = ExtResource( 1 )
-timeline_res = ExtResource( 3 )
+timeline_res = SubResource( 2 )
 autostart = true
 settings = {
 }
 
-[node name="ChoiceHandler" type="Node" parent="Timeline"]
+[node name="ChoiceHandler" type="Node" parent="Timeline2"]
 script = ExtResource( 2 )
 settings = {
 }
-button_overrides = [ NodePath("../../Button") ]
 
-[node name="TextHandler" type="Node" parent="Timeline"]
+[node name="TextHandler" type="Node" parent="Timeline2"]
 script = ExtResource( 5 )
-settings = {
-}
-
-[node name="Button" type="Button" parent="."]
-anchor_left = 1.0
-anchor_right = 1.0
-anchor_bottom = 1.0
-margin_left = -58.0
-text = "Default"
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="Timeline2" type="Node" parent="."]
-script = ExtResource( 1 )
-timeline_res = SubResource( 1 )
 settings = {
 }

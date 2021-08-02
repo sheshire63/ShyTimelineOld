@@ -22,10 +22,11 @@ func set_timeline(new) -> void:
 
 
 func _on_GraphEdit_node_selected(node: Node) -> void:
+	text_edit.visible = false
 	selected_event = node.event
-	if selected_event.get_node_type() == "TextEvent":
+	if selected_event.get_event_type() == "TextEvent":
 		text_edit.event = selected_event
-	text_edit.visible = true
+		text_edit.visible = true
 
 
 func _on_GraphEdit_focus_entered() -> void:

@@ -7,8 +7,12 @@ export var pos := Vector2.ZERO
 export var channel := ""
 
 
-static func get_node_type() -> String:
-	return "BaseNode"
+static func get_node() -> GraphNode:
+	return load("res://addons/ShyTimeline/Editor/NodeBase.tscn").instance()
+
+
+static func get_event_type() -> String:
+	return "BaseEvent"
 
 
 func create_control(id: int) -> Control:
@@ -24,7 +28,7 @@ func save() -> Dictionary:
 	data.events = next_events.duplicate(true)
 	data.channel = channel
 	data.data = _save().duplicate(true)
-	data.type = get_node_type()
+	data.type = get_event_type()
 	return data
 
 

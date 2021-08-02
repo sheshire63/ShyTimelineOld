@@ -52,7 +52,7 @@ func _on_ButtonRemove_pressed() -> void:
 func _set_event(new: Resource) -> void:
 	event = new
 	for i in event.next_events:
-		if i == 0:
+		if int(i) == 0:
 			continue
-		add_child(event.create_control(i))
-		set_slot(i, false, 0, 0, true, 0, Color.white)
+		add_child(event.create_control(int(i)))
+		set_slot(int(i), false, 0, 0, true, 0, Color.white)
