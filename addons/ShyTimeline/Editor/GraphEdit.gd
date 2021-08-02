@@ -43,16 +43,19 @@ func _add_events(events: Dictionary, to_timeline := false) -> void:
 		for i in events:
 			for j in events[i].next_events:
 				for k in events[i].next_events[j]:
-					events[i].next_events[j][names[k]] = k
-					events[i].next_events[j].erase([k])
+					if k in names:
+						events[i].next_events[j][names[k]] = events[i].next_events[j][k]
+						events[i].next_events[j].erase([k])
 	for i in events:
 		var node = _create_node(events[i])
 		node.offset = events[i].pos
+		if to_timeline:
+			 node.offset += Vector2(128, 128)
 		add_child(node)
 		node.name = names.get(i, i)
 		for j in node.event.next_events:
 			for k in node.event.next_events[j]:
-				call_deferred("connect_node", i, j, k, 0)
+				call_deferred("connect_node", node.name, int(j), k, 0)
 
 
 func _on_node_change_name_request(new: String, sender) -> void:
@@ -105,7 +108,9 @@ func _on_copy_nodes_request() -> void:
 		if i is GraphNode and i.selected:
 			data[i.name] = i.event.save()
 	OS.clipboard = to_json(data)
-
+	#this converts dictionary keys to strings and all numbers to floats.
+	#also objects(textures/images/sounds/...) will not be copied
+	#use a locale var instead and add export button to the menu
 
 func _on_delete_nodes_request() -> void:
 	var nodes := []
@@ -119,7 +124,8 @@ func _on_delete_nodes_request() -> void:
 	for i in get_connection_list():
 		if i.to in nodes:
 			timeline.events[i.from].next_events[i.from_port].erase(i.to)
-			disconnect_node(i.from, i.from_port, i.to, i.to_slot)
+		if i.to in nodes or i.from in nodes:
+			disconnect_node(i.from, i.from_port, i.to, i.to_port)
 
 
 func _delete_node(node:GraphNode) -> void:
@@ -128,7 +134,8 @@ func _delete_node(node:GraphNode) -> void:
 	for i in get_connection_list():
 		if i.to == node.name:
 			timeline.events[i.from].next_events[i.from_port].erase(i.to)
-			disconnect_node(i.from, i.from_port, i.to, i.to_slot)
+		if i.to == node.name or i.from == node.name:
+			disconnect_node(i.from, i.from_port, i.to, i.to_port)
 
 
 func _on_disconnection_request(from: String, from_slot: int, to: String, to_slot: int) -> void:
@@ -140,7 +147,7 @@ func _on_duplicate_nodes_request() -> void:
 	var data = {}
 	for i in get_children():
 		if i is GraphNode and i.selected:
-			data[i.name] = i.event
+			data[i.name] = i.event.duplicate(true)
 	_add_events(data, true)
 
 
@@ -159,7 +166,7 @@ func _on_paste_nodes_request() -> void:
 	if data:
 		for i in data:
 			for j in node_types:
-				if j.get_node_type() == data[i].type:
+				if j.get_event_type() == data[i].type:
 					var tmp = j.new()
 					tmp.load(data[i])
 					events[i] = tmp

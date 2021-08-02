@@ -10,3 +10,4 @@ lib/
 *.minder
 addons/ShyTimeline/readme.gd
 .directory
+*.zip
