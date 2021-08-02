@@ -49,17 +49,18 @@ func _compile_regex() -> void:
 		printerr("failed to compile _regex_escaped_chars")
 
 
-func format_text(text: String, replace_new_lines := false) -> Array:
-	text += "{wait()}"
+func format_text(text: String, replace_new_lines := false, add_wait := true) -> Array:
+	if add_wait:
+		text += "{wait()}"
 	var lines := []
 	if replace_new_lines:
 		text = text.replace("\n", "{end_line()}")
 	for i in _regex_brackets.search_all(text):
 		lines.append({"text": i.get_string("outer").format(variables, "<_>")})
-		lines.append_array(_handle_bracket(i.get_string("inner")))
+		lines.append_array(_handle_bracket(i.get_string("inner"), replace_new_lines))
 	for i in lines.size():
 		if lines[i].has("text"):
-			lines[i].text = lines[i].text.replace("\\n", "\n")#also for other escpes(\s,\t)?
+			lines[i].text = lines[i].text.replace("\\n", "\n")#also for other escapes(\s,\t)?
 			var regex_mach := _regex_escaped_chars.search(lines[i].text)
 			while regex_mach:
 				lines[i].text = text.erase(regex_mach.get_start(), 1)
@@ -67,7 +68,7 @@ func format_text(text: String, replace_new_lines := false) -> Array:
 	return lines
 
 
-func _handle_bracket(line: String) -> Array:
+func _handle_bracket(line: String, opt: bool) -> Array:
 	line += ","
 	var actions = []
 	var weights = []
@@ -99,7 +100,7 @@ func _handle_bracket(line: String) -> Array:
 	var total_weight = 0
 	for j in weights.size():
 		if weights[j]:
-			weights[j] = float(_add_up_values(weights[j]))
+			weights[j] = float(_add_up_values(weights[j], opt))
 			total_weight += weights[j]
 	var defaults = weights.count([])
 	for j in weights.size():
@@ -109,11 +110,11 @@ func _handle_bracket(line: String) -> Array:
 	for j in weights.size():
 		random -= weights[j]
 		if random <= 0.0:
-			return _handle_actions(actions[j])
+			return _handle_actions(actions[j], opt)
 	return []
 
 
-func _add_up_values(actions: Array):
+func _add_up_values(actions: Array, opt):
 	var value_a = ""
 	while actions:
 		var action = actions[0].get_string("operator")
@@ -147,7 +148,7 @@ func _add_up_values(actions: Array):
 		elif actions[0].get_string("bool") != "":
 			value_b = true if actions[0].get_string("bool") == "true" else false
 		elif actions[0].get_string("nested") != "":
-			value_b = _handle_bracket(actions[0].get_string("nested"))
+			value_b = _handle_bracket(actions[0].get_string("nested"), opt)
 		else:
 			value_b = actions[0].get_string("text")
 
@@ -253,14 +254,15 @@ func _add_up_values(actions: Array):
 	return value_a
 
 
-func _handle_actions(actions: Array) -> Array:
+func _handle_actions(actions: Array, opt: bool) -> Array:
 	var result := []
 	while actions:
 		var entry = {}
 		var action = actions[0].get_string("action")
 		if action != "" and actions[0].get_string("var") == "":
 			match action:
-				_:
+				#handle some actions here?
+				_:#give action to the handler
 					entry.action = action
 					entry.value = actions[0].get_string("arg")
 					entry.setting = actions[0].get_string("setting")
@@ -268,7 +270,7 @@ func _handle_actions(actions: Array) -> Array:
 			var variable = actions[0].get_string("var")
 			var operator = actions[1].get_string("operator")
 			actions.pop_front()
-			var value = _add_up_values(actions)
+			var value = _add_up_values(actions, opt)
 			match typeof(variables.get(variable)):
 				TYPE_BOOL:
 					value = bool(value)
@@ -294,7 +296,7 @@ func _handle_actions(actions: Array) -> Array:
 				"//=":
 					variables[variable] = pow(variables[variable], 1 / value)
 		else:
-			result.append_array(format_text(_add_up_values(actions)))
+			result.append_array(format_text(_add_up_values(actions, opt), opt, false))
 		result.append(entry)
 		actions.pop_front()
 	return result

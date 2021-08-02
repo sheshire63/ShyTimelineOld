@@ -11,9 +11,9 @@
 [sub_resource type="Resource" id=3]
 script = ExtResource( 8 )
 next_events = {
-0: [ "ChoiceEvent" ]
+0: [ "TextEvent1" ]
 }
-pos = Vector2( -80, -100 )
+pos = Vector2( -60, -220 )
 channel = ""
 text = "This is a base Test for TextEvents
 including chances {\"a\",\"b\",\"c\",\"d\"}.
@@ -25,32 +25,33 @@ more to be added"
 script = ExtResource( 7 )
 next_events = {
 0: [  ],
-1: [ "TextEvent" ]
+1: [ "TextEvent" ],
+2: [ "TextEvent1" ]
 }
-pos = Vector2( -200, -240 )
+pos = Vector2( -400, -200 )
 channel = ""
 choice_text = {
-1: "Text"
+1: "Text",
+2: "Chance"
 }
 choose_time = 0.0
 
 [sub_resource type="Resource" id=7]
-script = ExtResource( 7 )
+script = ExtResource( 8 )
 next_events = {
-0: [ "ChoiceEvent" ]
+0: [ "TextEvent1" ]
 }
-pos = Vector2( 260, -80 )
+pos = Vector2( -60, -100 )
 channel = ""
-choice_text = {
-}
-choose_time = 0.0
+text = "including chances {\"a\",\"b\",\"c\",\"d\"}.
+weighted chances {\"a\" 0.5, \"b\" 0.25, \"c\" 0.2, \"d\"}"
 
 [sub_resource type="Resource" id=2]
 script = ExtResource( 6 )
 events = {
-"ChoiceEvent": SubResource( 7 ),
 "Start": SubResource( 1 ),
-"TextEvent": SubResource( 3 )
+"TextEvent": SubResource( 3 ),
+"TextEvent1": SubResource( 7 )
 }
 start_event = "Start"
 name = ""
