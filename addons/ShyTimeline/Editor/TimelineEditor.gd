@@ -29,11 +29,12 @@ func _on_GraphEdit_node_selected(node: Node) -> void:
 		text_edit.visible = true
 
 
-func _on_GraphEdit_focus_entered() -> void:
-	selected_event = null
-	text_edit.visible = false
-
-
 func _on_GlobalVars_pressed() -> void:
 	var tmp = EditorPlugin.new()
 	#tmp.get_editor_interface().edit_node(TimelineVars)
+
+
+func _on_GraphEdit_node_unselected(node: Node) -> void:
+	if selected_event == node.event:
+		selected_event = null
+		text_edit.visible = false
