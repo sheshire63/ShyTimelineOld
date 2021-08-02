@@ -17,13 +17,13 @@ func _set_events(new) -> void:
 
 
 func get_unique_name(base: String) -> String:
-	base = base.validate_node_name()
+	base = base.validate_node_name().rstrip(str(int(base)))
 	if base in events.keys():
 		var c = 0
 		for i in events:
 			if i.begins_with(base):
 				c = max(c, int(i))
-		return "%s%04d"%[base, c + 1]
+		return "%s%d"%[base, c + 1]
 	return base
 
 
