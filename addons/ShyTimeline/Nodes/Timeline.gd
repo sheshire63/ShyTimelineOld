@@ -36,6 +36,7 @@ var c := 1
 func _ready() -> void:
 	if Engine.editor_hint:
 		return
+	connect("handle_event", self, "_default_handler")
 	Saves.connect("request_save", self, "save_state")
 	Saves.connect("request_load_save", self, "load_state")
 	if autostart:
@@ -71,12 +72,13 @@ func handle(event: String) -> void:
 """
 call from event_handlers after they finished handling a event
 """
-func event_handled(event: String) -> void:
+func event_handled(event: String, _continue := true) -> void:
 	if not event in active_events:
 		return
 	active_events.erase(event)
-	var next_events = timeline_res.events[event].next_events[0].duplicate()
-	event_queue.append_array(next_events)
+	if _continue:
+		var next_events = timeline_res.events[event].next_events[0].duplicate()
+		event_queue.append_array(next_events)
 
 
 func _unhandled_key_input(input_event: InputEventKey) -> void:
@@ -166,3 +168,18 @@ func _set_timeline(new) -> void:
 	timeline_res = new
 	active_events = []
 	event_queue = []
+
+
+func _default_handler(event: Resource, event_id: String, id: int) -> void:
+	if event.get_event_type() == "condition":
+		var flag := true
+		for i in event.conditions.size():
+			var value := ""
+			var condition: Array = Variables.format_text("{\"True\"" + event.conditions[i] + "}")
+			for j in condition:
+				value += j.text
+			if value != "":
+				handle_branch(event_id, i)
+			else:
+				flag = false
+		event_handled(event_id, flag)

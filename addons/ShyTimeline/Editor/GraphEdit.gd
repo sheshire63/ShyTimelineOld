@@ -23,7 +23,7 @@ func _ready() -> void:
 				node_types.append(load(NODE_FOLDER + "/" + file))
 				node_menu.add_item(file)
 			elif dir.dir_exists(file):
-				pass #add submenu?
+				pass #todo add submenu
 			file = dir.get_next()
 	if !Engine.editor_hint:
 		timeline = load(DEFAULT_TIMELINE).new()

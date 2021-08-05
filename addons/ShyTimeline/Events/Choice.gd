@@ -7,7 +7,7 @@ export var choose_time := 0.0
 
 
 static func get_event_type() -> String:
-	return "ChoiceEvent"
+	return "Choice"
 
 
 func create_control(id: int) -> Control:

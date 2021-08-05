@@ -6,7 +6,7 @@ export var text := "" setget _set_text
 
 
 static func get_event_type() -> String:
-	return "TextEvent"
+	return "Text"
 
 
 func _set_text(new) -> void:

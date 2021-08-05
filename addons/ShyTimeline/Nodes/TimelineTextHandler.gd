@@ -49,7 +49,7 @@ func _ready() -> void:
 
 
 func _on_handle_event(event: Resource, event_id: String, id: int) -> void:
-	if event.get_event_type() == "TextEvent":
+	if event.get_event_type() == "Text":
 		if interrupt:
 			_start_handle(event, event_id, id)
 			tween.stop_all()

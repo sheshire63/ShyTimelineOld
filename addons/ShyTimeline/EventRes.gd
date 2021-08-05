@@ -12,7 +12,7 @@ static func get_node() -> GraphNode:
 
 
 static func get_event_type() -> String:
-	return "BaseEvent"
+	return "Base"
 
 
 func create_control(id: int) -> Control:

@@ -2,6 +2,7 @@ tool
 extends EditorPlugin
 
 
+var timeline_node = preload("res://addons/ShyTimeline/Nodes/Timeline.gd")
 var timeline_editor: Control = load("res://addons/ShyTimeline/Editor/TimelineEditor.tscn").instance()
 var timeline_image: Texture = preload("res://addons/ShyTimeline/Icons/Timeline.png")
 var autoloads = {
@@ -66,11 +67,11 @@ func get_plugin_icon():
 
 
 func handles(object: Object) -> bool:
-	return object is Timeline
+	return object is timeline_node
 
 
 func edit(object: Object) -> void:
-	if object is Timeline:
+	if object is timeline_node:
 		timeline_editor.timeline = object.timeline_res
 		if get_editor_interface().is_playing_scene() and timeline_editor.visible == false:
 			get_editor_interface().set_main_screen_editor("Script")
