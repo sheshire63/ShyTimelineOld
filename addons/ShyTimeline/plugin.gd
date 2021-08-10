@@ -2,7 +2,7 @@ tool
 extends EditorPlugin
 
 
-var timeline_node = preload("res://addons/ShyTimeline/Nodes/Timeline.gd")
+onready var timeline_node = load("res://addons/ShyTimeline/Nodes/Timeline.gd")
 var timeline_editor: Control = load("res://addons/ShyTimeline/Editor/TimelineEditor.tscn").instance()
 var timeline_image: Texture = preload("res://addons/ShyTimeline/Icons/Timeline.png")
 var autoloads = {
@@ -16,14 +16,17 @@ func _enter_tree() -> void:
 	get_editor_interface().get_editor_viewport().add_child(timeline_editor)
 	for i in autoloads:
 		add_autoload_singleton(i , autoloads[i])
-	for i in get_node("/root/Settings").settings:
-		add_setting(i, get_node("/root/Settings").settings[i])
+	call_deferred("add_settings")
 	make_visible(false)
 	ProjectSettings.save()
 
 
+func add_settings() -> void:
+	for i in get_node("/root/Settings").settings:
+		_add_setting(i, get_node("/root/Settings").settings[i])
 
-func add_setting(setting: String, value) -> void:
+
+func _add_setting(setting: String, value) -> void:
 	if !ProjectSettings.has_setting("ShyTimeline/settings/" + setting):
 		ProjectSettings.set_setting("ShyTimeline/settings/" + setting, value)
 		ProjectSettings.set_initial_value("ShyTimeline/settings/" + setting, value)
