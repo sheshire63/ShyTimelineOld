@@ -1,0 +1,9 @@
+[gd_scene format=3 uid="uid://cx8jf5kcn03rk"]
+
+[node name="Control" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = null
+__meta__ = {
+"_edit_use_anchors_": false
+}

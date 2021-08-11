@@ -1,0 +1,5 @@
+res://Example.tscn
+res://addons/ShyTimeline/Editor/TimelineEditor.gd
+res://addons/ShyTimeline/Editor/TimelineEditor.tscn
+res://addons/ShyTimeline/TimelineRes.gd
+res://default_env.tres
