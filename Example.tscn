@@ -1,29 +1,59 @@
-[gd_scene load_steps=13 format=2]
+[gd_scene load_steps=17 format=2]
 
 [ext_resource path="res://addons/ShyTimeline/Nodes/Timeline.gd" type="Script" id=1]
 [ext_resource path="res://addons/ShyTimeline/Nodes/TimelineChoiceHandler.gd" type="Script" id=2]
+[ext_resource path="res://addons/ShyTimeline/Nodes/TimelineInputHandler.gd" type="Script" id=3]
 [ext_resource path="res://Example.gd" type="Script" id=4]
 [ext_resource path="res://addons/ShyTimeline/Nodes/TimelineTextHandler.gd" type="Script" id=5]
 [ext_resource path="res://addons/ShyTimeline/TimelineRes.gd" type="Script" id=6]
 [ext_resource path="res://addons/ShyTimeline/Events/Choice.gd" type="Script" id=7]
 [ext_resource path="res://addons/ShyTimeline/Events/Text.gd" type="Script" id=8]
+[ext_resource path="res://addons/ShyTimeline/Events/Input.gd" type="Script" id=9]
 
 [sub_resource type="Resource" id=1]
+script = ExtResource( 9 )
+next_events = {
+0: [ "Text" ],
+1: [  ]
+}
+pos = Vector2( -100, 0 )
+channel = ""
+inputs = {
+1: {
+"type": 4,
+"value": "Player",
+"variable": "name"
+}
+}
+input_time = 0.0
+
+[sub_resource type="Resource" id=2]
 script = ExtResource( 7 )
 next_events = {
 0: [  ],
 1: [ "TextEvent" ],
-2: [ "TextEvent1" ]
+2: [ "TextEvent1" ],
+3: [ "Input" ]
 }
-pos = Vector2( -400, -200 )
+pos = Vector2( -460, -180 )
 channel = ""
 choice_text = {
 1: "Text",
-2: "Chance"
+2: "Chance",
+3: "input"
 }
 choose_time = 0.0
 
-[sub_resource type="Resource" id=2]
+[sub_resource type="Resource" id=3]
+script = ExtResource( 8 )
+next_events = {
+0: [  ]
+}
+pos = Vector2( 240, 20 )
+channel = ""
+text = "<name>"
+
+[sub_resource type="Resource" id=4]
 script = ExtResource( 8 )
 next_events = {
 0: [  ]
@@ -36,7 +66,7 @@ weighted chances {\"a\" 0.5, \"b\" 0.25, \"c\" 0.2, \"d\"}
 variables <player>
 more to be added"
 
-[sub_resource type="Resource" id=3]
+[sub_resource type="Resource" id=5]
 script = ExtResource( 8 )
 next_events = {
 0: [ "TextEvent1" ]
@@ -46,17 +76,19 @@ channel = ""
 text = "including chances {\"a\",\"b\",\"c\",\"d\"}.
 weighted chances {\"a\" 0.5, \"b\" 0.25, \"c\" 0.2, \"d\"}"
 
-[sub_resource type="Resource" id=4]
+[sub_resource type="Resource" id=6]
 script = ExtResource( 6 )
 events = {
-"Start": SubResource( 1 ),
-"TextEvent": SubResource( 2 ),
-"TextEvent1": SubResource( 3 )
+"Input": SubResource( 1 ),
+"Start": SubResource( 2 ),
+"Text": SubResource( 3 ),
+"TextEvent": SubResource( 4 ),
+"TextEvent1": SubResource( 5 )
 }
 start_event = "Start"
 name = ""
 
-[sub_resource type="Resource" id=5]
+[sub_resource type="Resource" id=7]
 script = ExtResource( 6 )
 events = {
 }
@@ -73,23 +105,54 @@ __meta__ = {
 
 [node name="Timeline2" type="Node" parent="."]
 script = ExtResource( 1 )
-timeline_res = SubResource( 4 )
+timeline_res = SubResource( 6 )
 autostart = true
-settings = {
-}
-
-[node name="ChoiceHandler" type="Node" parent="Timeline2"]
-script = ExtResource( 2 )
-settings = {
-}
-
-[node name="TextHandler" type="Node" parent="Timeline2"]
-script = ExtResource( 5 )
 settings = {
 }
 
 [node name="Timeline" type="Node" parent="."]
 script = ExtResource( 1 )
-timeline_res = SubResource( 5 )
+timeline_res = SubResource( 7 )
 settings = {
 }
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+anchor_left = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="ChoiceHandler" type="Node" parent="VBoxContainer"]
+script = ExtResource( 2 )
+settings = {
+}
+timeline_path = NodePath("../../Timeline2")
+
+[node name="RichTextLabel" type="RichTextLabel" parent="."]
+anchor_bottom = 1.0
+margin_right = 654.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="TextHandler" type="Node" parent="RichTextLabel"]
+script = ExtResource( 5 )
+settings = {
+}
+timeline_path = NodePath("../../Timeline2")
+
+[node name="VBoxContainer2" type="VBoxContainer" parent="."]
+margin_right = 40.0
+margin_bottom = 40.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="InputHandler" type="Node" parent="VBoxContainer2"]
+script = ExtResource( 3 )
+settings = {
+}
+timeline_path = NodePath("../../Timeline2")

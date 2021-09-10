@@ -6,11 +6,12 @@ class_name TextHandler
 
 signal _continue
 
-export(NodePath) var text_label_path
+
 export var interrupt := false
 export var stop_on_interrupt := false
+export(NodePath) var _parent
 
-var text_label: Control
+onready var text_label: RichTextLabel = get_parent()
 var tween := Tween.new()
 var timer := Timer.new()
 var is_active := false
@@ -23,26 +24,14 @@ var current_event : Dictionary
 
 
 func _get_configuration_warning() -> String:
-	if not get_parent() is Timeline:
-		return "needs to be a child of Timeline"
-	# only allow RichTextLabel because of bbcode?
-	if text_label_path and "bbcode_text" in get_node(text_label_path).get_property_list():
-		return "the text label has no text property"
+	if not get_parent() is RichTextLabel:
+		return "needs to be a child of a RichTextLabel"
 	return ""
 
 
 func _ready() -> void:
 	if Engine.editor_hint:
 		return
-	if text_label_path:
-		text_label = get_node(text_label_path)
-	else:
-		text_label = RichTextLabel.new()
-		text_label.set_anchors_preset(Control.PRESET_WIDE)
-		var canvas = CanvasLayer.new()
-		text_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		add_child(canvas)
-		canvas.add_child(text_label)
 	add_child(tween)
 	timer.one_shot = true
 	add_child(timer)

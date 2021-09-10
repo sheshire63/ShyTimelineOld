@@ -51,6 +51,7 @@ func _on_ButtonRemove_pressed() -> void:
 
 func _set_event(new: Resource) -> void:
 	event = new
+	label = event.get_event_type()
 	for i in event.next_events:
 		if int(i) == 0:
 			continue

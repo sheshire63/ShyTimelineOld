@@ -5,16 +5,11 @@ class_name BaseHandler
 
 
 export var settings := {}
+export(NodePath) var timeline_path
 
-onready var timeline = get_parent()
+var timeline: Timeline
 
 var settings_override := {}
-
-
-func _get_configuration_warning() -> String:
-	if not get_parent() is Timeline:
-		return "needs to be a child of Timeline"
-	return ""
 
 
 func _ready() -> void:
@@ -22,6 +17,7 @@ func _ready() -> void:
 		return
 	Saves.connect("request_save", self, "save_state")
 	Saves.connect("request_load_save", self, "load_state")
+	timeline = get_node(timeline_path)
 	if !timeline:
 		print("timeline not found")
 	timeline.connect("handle_event", self, "_on_handle_event")
