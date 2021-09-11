@@ -21,7 +21,7 @@ channel = ""
 inputs = {
 1: {
 "type": 4,
-"value": "Player",
+"value": "Lin",
 "variable": "name"
 }
 }
@@ -51,7 +51,7 @@ next_events = {
 }
 pos = Vector2( 240, 20 )
 channel = ""
-text = "<name>"
+text = "so you are <name>"
 
 [sub_resource type="Resource" id=4]
 script = ExtResource( 8 )
